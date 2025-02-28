@@ -30,7 +30,7 @@ Document
 ### Setting up the repository
 
 ```
-git clone https://github.com/FA24-CSCE431-software-engineering/cleo-course-scheduler.git
+git clone git@github.com:teamup-org/cleo-asp-501.git
 ```
 
 If you have already cloned and would like to update locally
@@ -51,11 +51,17 @@ docker run -it --volume "${PWD}:/directory" -e DATABASE_USER=cleo_app -e DATABAS
 
 If you want to re-enter an existing container 
 
+run `docker ps` to find your docker
+then...
 ```
-docker start -ai determined_dubinsky
+docker start <docker_id>
+docker exec -it <docker_id> bash
 ```
 
-*Note: replace determined_dubinsky with the name of the docker container
+Once your finished call
+```
+docker stop <docker_id>
+```
 
 ### Installing Dependencies
 ```
@@ -116,7 +122,14 @@ Replace the ellipses with your own secrets/
 
 The instructions for setting the environment variables on Render can be found below.
 
-
+You will want your .env file to look something like this:
+```
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+ADMIN_EMAILS=example1@example.edu,example2@example.edu
+CLEO_COURSE_SCHEDULER_DATABASE_PASSWORD=... (You will get this when deploying your db or you can set it but it must be the same when deploying your db)
+DATABASE_HOST=localhost (Will change to the database host name when deploying)
+```
 ## Deployment
 
 The following steps will result in the deployment of a Render Postgres Database (required for web service).
@@ -170,7 +183,7 @@ To all developers looking to build upon this project, here are several features 
 - Ability for users to express their interests more (outside of ```tracks``` and ```emphasis```) allowing for a more involved reccomendation algorithm
 
 ## Acknowledgement
-We would like to thank Professor Wade, Pratik and Sundhanva for their continued support in this project. We would also like to thank our customer Dr. Kebo for his insights, feedback and creation of a positive environment for learning.
+We would like to thank Professor Wade for her continued support in this project. We would also like to thank our customer Dr. Kebo for his insights, feedback and creation of a positive environment for learning.
 
 Prevoius Cleo group members:
 - Maria Viteri
