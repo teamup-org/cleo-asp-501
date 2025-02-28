@@ -16,7 +16,6 @@ What is needed to run and code our test:
 ## External dependencies
 
 - Docker - Download latest version at https://www.docker.com/products/docker-desktop
-- Heroku CLI - Download latest version at https://devcenter.heroku.com/articles/heroku-cli
 - Git - Download latest version at https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ## Documentation
@@ -115,18 +114,32 @@ GOOGLE_CLIENT_SECRET="..."
 ```
 Replace the ellipses with your own secrets/
 
-The instructions for setting the environment variables on Heroku can be found below.
+The instructions for setting the environment variables on Render can be found below.
 
 
 ## Deployment
 
-The following steps will result in the deployment of a Heroku Pipeline.
-1. Setup a [Heroku](https://signup.heroku.com/) account
-2. From the Heroku dashboard select `New` -> `Create New Pipeline`
-3. Name the pipeline, and link the respective git repository to the pipeline
-4. Select `Enable Review Apps`
-5. Click `New app` under review apps, and link the test branch from your repo
-6. Under staging app, select `Create new app` and link the main branch from your repo
+The following steps will result in the deployment of a Render Postgres Database (required for web service).
+1. Setup a [Render](https://render.com/) account
+2. From the Render dashboard select `Add New` -> `Postgres`
+3. Enter a name
+4. Select a github repository (You may have to link your github account) and then select the enviroment (production).
+5. Set the database name to `cleo_course_scheduler_production`
+6. Set the database user to `cleo_course_scheduler`
+7. Select your desired plan the select `Create Database`
+8. Copy the `Host Name`
+
+The following steps will result in the deployment of a Render Postgres Web service.
+1. From the Render dashboard select `Add New` -> `Web Service`
+2. Select a github repository
+3. Enter a name
+4. Select a project (Your github repo) and an enviroment (production)
+5. Set the `Language` to `Ruby`
+6. Select the Desired payment
+7. At the `Environment Variables` section, click `Add from .env` then copy and paste the .env file. After that you will copy the key from your `master.key` file.
+(If you do not have this key you can generate it with `rails credentials:edit`) copy and paste that key into Render's `RAILS_MASTER_KEY`. After that change DATABASE_HOST from `localhost` to your copied `Host Name`.
+8. replace `Build Command` with `bundle install; yarn install; bundle exec rake assets:precompile; bundle exec rake assets:clean; bundle exec rails db:create db:migrate db:seed;`
+9. Select `Create Web Service`
 
 ### Deployment Environment Variables
 To enable Google Oauth2, head over to the settings tab on the pipeline dashboard. 
@@ -147,12 +160,8 @@ Continuous integration was employed through the use of Github actions. Our workf
 - Rubocop linting
 - Brakeman tests
 
-Continuous Development was setup through Heroku which has been linked to our Github repositories. The pipeline includes:
-- Review application through ```test``` branch
-- Production application through ```main``` branch
-
 ## Support
-The support of the application will (hopefull) close on 25 November 2024. 
+The support of the application will close on May 6th.
 
 ## Future Development
 To all developers looking to build upon this project, here are several features that could be extended for greater usability:
@@ -163,12 +172,20 @@ To all developers looking to build upon this project, here are several features 
 ## Acknowledgement
 We would like to thank Professor Wade, Pratik and Sundhanva for their continued support in this project. We would also like to thank our customer Dr. Kebo for his insights, feedback and creation of a positive environment for learning.
 
-Below lists the members who contributed to this project:
+Prevoius Cleo group members:
 - Maria Viteri
 - Uzma Hamid
 - Vincent Tran
 - Tatiana Fern
 - Neale Tham
+
+Current Cleo group members:
+- Kyle Moore
+- Joe Depolo
+- Danny Garmendez
+- Alyan Tharani
+- Cameron Cao  
+
 
 ## References
 - [Stack Overflow](https://stackoverflow.com)
