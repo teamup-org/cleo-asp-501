@@ -19,11 +19,10 @@ What is needed to run and code our test:
 - Git - Download latest version at https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ## Documentation
-Our [product and sprint backlog](https://asp500.atlassian.net/jira/software/projects/A5/boards/2) can be found in Jira, with project name asp-500
+Our [product and sprint backlog](https://501-cleo.atlassian.net/jira/software/projects/CLEO/boards/1/backlog) can be found in Jira, with project name CLEO
 
 Document
-- [asp-500_Sprint3DataDesignv1](https://tamucs.sharepoint.com/:b:/r/teams/Team-Fall24-CSCE431SoftwareEngineering-asp-500-Course/Shared%20Documents/asp-500-Course/Sprint%203/Documents/asp-500_Sprint3DataDesignv1.pdf?csf=1&web=1&e=ebxSOO)
-- [asp-500_Sprint3Scope](https://tamucs.sharepoint.com/:b:/r/teams/Team-Fall24-CSCE431SoftwareEngineering-asp-500-Course/Shared%20Documents/asp-500-Course/Sprint%203/Documents/asp-500_Sprint3Scope.pdf?csf=1&web=1&e=fOKWUr)
+...
 
 ## Installation
 
