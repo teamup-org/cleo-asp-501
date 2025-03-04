@@ -12,7 +12,7 @@ CSV_FILE = "../data/gpa.csv"
 os.makedirs(os.path.dirname(CSV_FILE), exist_ok=True)
 
 # Read CSV file
-df = pd.read_csv("gpa.csv")
+df = pd.read_csv("../data/grades.csv")
 
 # Convert all relevant columns to integers (ignoring non-numeric columns)
 grade_columns = ["A", "B", "C", "D", "F", "Q"]
