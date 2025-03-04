@@ -27,6 +27,9 @@ tracks_csv = Rails.root.join('lib', 'data', 'manual', 'tracks.csv')
 emphasis_csv = Rails.root.join('lib', 'data', 'manual', 'emphasis.csv')
 emphasis_courses_csv = Rails.root.join('lib', 'data', 'manual', 'emphasis_courses.csv')
 
+# New scraped data
+gpa_courses_csv = Rails.root.join('lib', 'data', 'gpa.csv')
+
 # Seed with courses
 CSV.foreach(courses_csv, headers: true) do |row|
   Course.find_or_create_by(
@@ -163,4 +166,24 @@ CSV.foreach(emphasis_courses_csv, headers: true) do |row|
     course: Course.find_by(ccode: row['ccode'], cnumber: row['cnumber']),
     emphasis: Emphasis.find_by(ename: row['ename'])
   )
+end
+
+
+CSV.foreach(gpa_courses_csv, headers: true) do |row|
+  # Find the course_id using ccode and cnumber
+  course = Course.find_by(ccode: row['dept'], cnumber: row['number'])
+
+  if course # Only proceed if a matching course is found
+    formatted_semester = "#{row['semester']} #{row['year']}"
+
+    ProfHistory.find_or_create_by(
+      course_id: course.id,
+      teacher_name: row['prof'],
+      semester: formatted_semester
+    ) do |ph|
+      ph.average_gpa = row['gpa']
+    end
+  else
+    puts "Course not found for ccode: #{row['dept']} and cnumber: #{row['number']}"
+  end
 end

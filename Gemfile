@@ -15,7 +15,7 @@ gem 'zeitwerk', '< 2.7.0'
 # Add net-pop with a specific version
 
 # Other gems...
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: %i[mingw mswin mswin64 jruby]
 gem "bootsnap", require: false
 gem 'devise'
 gem 'omniauth'

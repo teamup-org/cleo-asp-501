@@ -72,4 +72,6 @@ yarn.lock
 # dup
 /config/master.key
 
+#For Macbook Development
+.DS_Store
 
