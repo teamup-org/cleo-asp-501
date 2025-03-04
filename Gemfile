@@ -24,6 +24,7 @@ gem 'omniauth-rails_csrf_protection'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'bootstrap', '~> 5.0.0'
 gem 'sassc-rails'
+gem 'pycall'
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
