@@ -85,6 +85,13 @@ Rails.application.routes.draw do
       get 'confirm_destroy'
       get 'degree_planner', to: 'degree_planner#show'
       post 'degree_planner', to: 'degree_planner#generate_custom_plan'
+      
+      get 'upload_transcript'
+      post 'upload_transcript'
+      post 'save_transcript_courses', to: 'students#save_transcript_courses'
+      get 'view_transcript_courses', to: 'students#view_transcript_courses'
+      delete 'remove_transcript_course', to: 'students#remove_transcript_course'
+      post 'add_transcript_course', to: 'students#add_transcript_course'
     end
 
     resource :degree_planner, only: [:show], controller: 'degree_planner' do
@@ -108,6 +115,14 @@ Rails.application.routes.draw do
       get 'viewDefaultPlan'
     end
   end
+
+  #Remove only for testing forntned transcript logic
+  resources :students do
+    member do
+      post 'upload_transcript'
+    end
+  end
+
 
   # Default degree routes
   resources :def_degree, only: %i[show new create]
