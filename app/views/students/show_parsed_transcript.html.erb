@@ -1,0 +1,728 @@
+<!-- filepath: /Users/alyantharani/Desktop/Academics/CSCE-431/cleo-asp-501/app/views/students/show_parsed_transcript.html.erb -->
+<div class="container-fluid mt-4">
+  <% if flash[:alert] || flash[:notice] || flash[:success] %>
+    <div class="flash-messages mb-4">
+      <% flash.each do |type, message| %>
+        <% next if message.blank? %>
+        <div class="alert alert-<%= type == 'alert' ? 'danger' : (type == 'notice' ? 'info' : 'success') %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+    </div>
+    <% flash.clear %>
+  <% end %>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">
+      <%= params[:action] == 'view_transcript_courses' ? 'Edit Transcript Courses' : 'Review Parsed Transcript Data' %>
+    </h1>
+    <div>
+      <% if params[:action] == 'view_transcript_courses' %>
+        <%= link_to profile_student_path(current_student_login), class: "btn btn-outline-secondary" do %>
+          <i class="fas fa-arrow-left me-2"></i> Back to Profile
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Add/Edit Class Modal -->
+  <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="courseModalLabel">Add/Edit Course</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <%= form_tag add_transcript_course_student_path(current_student_login), method: :post, class: 'course-form', id: 'courseForm' do %>
+          <div class="modal-body">
+            <input type="hidden" name="semester" id="modalSemester">
+            <input type="hidden" name="edit_mode" id="modalEditMode" value="false">
+            
+            <div class="mb-3">
+              <label for="ccode" class="form-label">Course Code (e.g., CSCE)</label>
+              <input type="text" class="form-control" id="ccode" name="ccode" required pattern="[A-Z]{2,4}">
+            </div>
+            
+            <div class="mb-3">
+              <label for="cnumber" class="form-label">Course Number (e.g., 431)</label>
+              <input type="text" class="form-control" id="cnumber" name="cnumber" required pattern="\d{3}[A-Z]?">
+            </div>
+            
+            <div class="mb-3">
+              <label for="cname" class="form-label">Course Name</label>
+              <input type="text" class="form-control" id="cname" name="cname">
+            </div>
+            
+            <div class="mb-3">
+              <label for="credit_hours" class="form-label">Credit Hours</label>
+              <input type="number" class="form-control" id="credit_hours" name="credit_hours" min="0" max="12" step="1" value="3">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Course</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% if @grouped_courses.present? && !@grouped_courses.empty? %>
+    <%= form_tag save_transcript_courses_student_path(current_student_login), method: :post, id: 'transcript-form', class: 'transcript-form', data: { turbo: false } do %>
+      <div class="row">
+        <% @grouped_courses.each do |semester, courses| %>
+          <div class="col-md-6 mb-4">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><%= semester %></h3>
+                <button type="button" class="btn btn-sm btn-success add-class-btn" data-semester="<%= semester %>">
+                  <i class="fas fa-plus me-1"></i> Add Class
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+    <thead>
+      <tr>
+                        <% if params[:action] != 'view_transcript_courses' %>
+                          <th style="width: 10%">Include</th>
+                        <% end %>
+                        <th style="width: 15%">Course Code</th>
+                        <th style="width: 15%">Course Number</th>
+                        <th style="width: <%= params[:action] == 'view_transcript_courses' ? '50%' : '45%' %>">Course Name</th>
+                        <th style="width: 15%">Hours</th>
+                        <% if params[:action] == 'view_transcript_courses' %>
+                          <th style="width: 20%">Actions</th>
+                        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+                      <% courses.each_with_index do |course, index| %>
+                        <tr>
+                          <% if params[:action] != 'view_transcript_courses' %>
+                            <td>
+                              <%= check_box_tag "course_checkbox_#{index}", "1", true, 
+                                  class: 'course-checkbox',
+                                  data: { 
+                                    index: index,
+                                    semester: semester,
+                                    course_id: Course.find_by(ccode: course['ccode'], cnumber: course['cnumber'])&.id
+                                  } %>
+                            </td>
+                          <% end %>
+                          <td>
+                            <% if params[:action] != 'view_transcript_courses' %>
+                              <input type="text" class="form-control form-control-sm course-code-input"
+                                value="<%= course['ccode'] %>"
+                                data-index="<%= index %>"
+                                data-original="<%= course['ccode'] %>"
+                                pattern="[A-Z]{2,4}"
+                                required>
+                            <% else %>
+                              <%= course['ccode'] %>
+                            <% end %>
+                          </td>
+                          <td>
+                            <% if params[:action] != 'view_transcript_courses' %>
+                              <input type="text" class="form-control form-control-sm course-number-input"
+                                value="<%= course['cnumber'] %>"
+                                data-index="<%= index %>"
+                                data-original="<%= course['cnumber'] %>"
+                                pattern="\d{3}[A-Z]?"
+                                required>
+                            <% else %>
+                              <%= course['cnumber'] %>
+                            <% end %>
+                          </td>
+                          <td>
+                            <% if params[:action] != 'view_transcript_courses' %>
+                              <input type="text" class="form-control form-control-sm course-name-input"
+                                value="<%= course['cname'] %>"
+                                data-index="<%= index %>"
+                                data-original="<%= course['cname'] %>">
+                            <% else %>
+                              <%= course['cname'] %>
+                            <% end %>
+                          </td>
+                          <td>
+                            <% if params[:action] != 'view_transcript_courses' %>
+                              <input type="number" class="form-control form-control-sm course-hours-input"
+                                value="<%= course['credit_hours'] %>"
+                                min="0" max="12" step="1"
+                                data-index="<%= index %>"
+                                data-original="<%= course['credit_hours'] %>">
+                            <% else %>
+                              <%= course['credit_hours'] %>
+                            <% end %>
+                          </td>
+                          <% if params[:action] == 'view_transcript_courses' %>
+                            <td class="text-end">
+                              <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary edit-course-btn"
+                                  data-semester="<%= semester %>"
+                                  data-ccode="<%= course['ccode'] %>"
+                                  data-cnumber="<%= course['cnumber'] %>"
+                                  data-cname="<%= course['cname'] %>"
+                                  data-credit-hours="<%= course['credit_hours'] %>">
+                                  <i class="fas fa-edit"></i>
+                                </button>
+                                <%= button_to remove_transcript_course_student_path(current_student_login, 
+                                      course_id: Course.find_by(ccode: course['ccode'], cnumber: course['cnumber'])&.id,
+                                      semester: semester),
+                                      method: :delete,
+                                      class: 'btn btn-outline-danger',
+                                      form: { style: 'display: inline-block;', data: { turbo: false } },
+                                      data: { confirm: 'Are you sure you want to remove this course?' } do %>
+                                  <i class="fas fa-trash"></i>
+                                <% end %>
+                              </div>
+                            </td>
+                          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="actions sticky-footer">
+        <div class="container-fluid px-3">
+          <div class="d-flex justify-content-between align-items-center py-2">
+            <div class="d-flex align-items-center gap-2">
+              <% if params[:action] != 'view_transcript_courses' %>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-2"></i> Save Selected
+                </button>
+              <% end %>
+              <%= link_to 'Back', profile_student_path(current_student_login), class: "btn btn-outline-secondary" %>
+            </div>
+            <div class="text-muted small">
+              <% if params[:action] != 'view_transcript_courses' %>
+                <span class="selected-count"></span>
+              <% else %>
+                <%= pluralize(@grouped_courses.values.flatten.count, 'course') %> total
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="alert alert-info">
+      <p>
+        <% if params[:action] == 'view_transcript_courses' %>
+          No courses found in your transcript history. Please upload a transcript or add courses manually.
+<% else %>
+          No courses were found in the transcript. Please ensure you've uploaded a valid transcript file.
+        <% end %>
+      </p>
+      <% if @parse_error %>
+        <p class="text-danger"><strong>Error details:</strong> <%= @parse_error %></p>
+      <% end %>
+    </div>
+    <div class="mt-3">
+      <%= link_to 'Back to Profile', profile_student_path(current_student_login), class: "btn btn-primary me-2" %>
+      <% if params[:action] == 'view_transcript_courses' %>
+        <%= link_to 'Upload Transcript', upload_transcript_student_path(current_student_login), class: "btn btn-success" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% content_for :head do %>
+  <style>
+    .transcript-form .card {
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    .transcript-form .card-header {
+      background-color: #f8f9fa;
+      padding: 0.75rem 1rem;
+    }
+    .transcript-form .card-header h3 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+    .transcript-form .table {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+    }
+    .transcript-form .table th,
+    .transcript-form .table td {
+      vertical-align: middle;
+      padding: 0.5rem;
+    }
+    .sticky-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid #dee2e6;
+      box-shadow: 0 -1px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+    .table-responsive {
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+      margin-bottom: 3rem;
+    }
+    .add-class-btn {
+      white-space: nowrap;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    .gap-2 {
+      gap: 0.5rem;
+    }
+    .modal-content {
+      border-radius: 0.5rem;
+    }
+    .modal-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .modal-footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+    .form-control {
+      border-radius: 0.25rem;
+    }
+    .btn-group-sm > .btn {
+      padding: 0.25rem 0.5rem;
+    }
+    .me-1 {
+      margin-right: 0.25rem;
+    }
+    .me-2 {
+      margin-right: 0.5rem;
+    }
+    .course-code-input,
+    .course-number-input,
+    .course-name-input,
+    .course-hours-input {
+      border: 1px solid #dee2e6;
+      background-color: #fff;
+      transition: border-color 0.15s ease-in-out;
+    }
+    
+    .course-code-input:focus,
+    .course-number-input:focus,
+    .course-name-input:focus,
+    .course-hours-input:focus {
+      border-color: #86b7fe;
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .course-code-input {
+      width: 80px;
+    }
+    
+    .course-number-input {
+      width: 90px;
+    }
+    
+    .course-hours-input {
+      width: 70px;
+    }
+    .alert {
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .alert-success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+    
+    .alert-info {
+      background-color: #cff4fc;
+      color: #055160;
+    }
+    
+    .btn-close {
+      opacity: 0.5;
+    }
+    
+    .btn-close:hover {
+      opacity: 0.75;
+    }
+  </style>
+<% end %>
+
+<% content_for :javascript do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-dismiss flash messages after 5 seconds
+      setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+          const closeButton = alert.querySelector('.btn-close');
+          if (closeButton) {
+            closeButton.click();
+          }
+        });
+      }, 5000);
+
+      const form = document.getElementById('transcript-form');
+      const checkboxes = document.querySelectorAll('.course-checkbox');
+      const selectedCountSpan = document.querySelector('.selected-count');
+      const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
+      
+      function updateSelectedCount() {
+        const checkedCount = document.querySelectorAll('.course-checkbox:checked').length;
+        selectedCountSpan.textContent = `${checkedCount} courses selected`;
+      }
+      
+      if (checkboxes.length > 0) {
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', updateSelectedCount);
+        });
+        updateSelectedCount();
+      }
+      
+      if (form) {
+        // Add debounced auto-save function for input changes
+        function debounce(func, wait) {
+          let timeout;
+          return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+          };
+        }
+
+        // Function to save a single course change
+        async function saveCourseChange(courseData) {
+          try {
+            const response = await fetch(`/students/${current_student_login}/update_course`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+              },
+              body: JSON.stringify(courseData)
+            });
+            
+            const result = await response.json();
+            if (!response.ok) {
+              throw new Error(result.error || 'Failed to save course change');
+            }
+            
+            console.log('Course change saved:', result);
+          } catch (error) {
+            console.error('Error saving course change:', error);
+            // Show error in UI without disrupting the user
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+            errorDiv.innerHTML = `
+              Error saving changes: ${error.message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.flash-messages').appendChild(errorDiv);
+          }
+        }
+
+        // Debounced version of saveCourseChange
+        const debouncedSave = debounce(saveCourseChange, 1000);
+
+        // Add change listeners to all input fields
+        document.querySelectorAll('.course-code-input, .course-number-input, .course-name-input, .course-hours-input').forEach(input => {
+          input.addEventListener('change', function() {
+            const row = this.closest('tr');
+            const checkbox = row.querySelector('.course-checkbox');
+            if (!checkbox) return;
+
+            const courseData = {
+              semester: checkbox.dataset.semester,
+              course_id: checkbox.dataset.courseId,
+              ccode: row.querySelector('.course-code-input').value.trim().toUpperCase(),
+              cnumber: row.querySelector('.course-number-input').value.trim(),
+              cname: row.querySelector('.course-name-input').value.trim(),
+              credit_hours: parseFloat(row.querySelector('.course-hours-input').value)
+            };
+
+            // Validate before saving
+            try {
+              if (!courseData.ccode || !courseData.cnumber || isNaN(courseData.credit_hours)) {
+                throw new Error('Missing required fields');
+              }
+              if (!/^[A-Z]{2,4}$/.test(courseData.ccode)) {
+                throw new Error('Invalid course code format');
+              }
+              if (!/^\d{3}[A-Z]?$/.test(courseData.cnumber)) {
+                throw new Error('Invalid course number format');
+              }
+              if (courseData.credit_hours < 0 || courseData.credit_hours > 12) {
+                throw new Error('Invalid credit hours');
+              }
+
+              debouncedSave(courseData);
+            } catch (error) {
+              console.error('Validation error:', error);
+              this.value = this.dataset.original;
+              alert(error.message);
+            }
+          });
+        });
+
+        // Modify form submission to handle new courses
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          console.log('Form submission started');
+          
+          const selectedCourses = [];
+          
+          try {
+            const courseRows = document.querySelectorAll('tbody tr');
+            
+            courseRows.forEach(row => {
+              const checkbox = row.querySelector('.course-checkbox');
+              if (!checkbox || !checkbox.checked) return;
+              
+              const courseData = {
+                semester: checkbox.dataset.semester,
+                ccode: row.querySelector('.course-code-input').value.trim().toUpperCase(),
+                cnumber: row.querySelector('.course-number-input').value.trim(),
+                cname: row.querySelector('.course-name-input').value.trim(),
+                credit_hours: parseFloat(row.querySelector('.course-hours-input').value)
+              };
+              
+              // Validate course data
+              if (!courseData.ccode || !courseData.cnumber || isNaN(courseData.credit_hours)) {
+                throw new Error(`Missing required data for course ${courseData.ccode || ''} ${courseData.cnumber || ''}`);
+              }
+              
+              if (!/^[A-Z]{2,4}$/.test(courseData.ccode)) {
+                throw new Error(`Invalid course code format for ${courseData.ccode}`);
+              }
+              
+              if (!/^\d{3}[A-Z]?$/.test(courseData.cnumber)) {
+                throw new Error(`Invalid course number format for ${courseData.cnumber}`);
+              }
+              
+              if (courseData.credit_hours < 0 || courseData.credit_hours > 12) {
+                throw new Error(`Invalid credit hours for ${courseData.ccode} ${courseData.cnumber}`);
+              }
+              
+              selectedCourses.push(courseData);
+            });
+            
+            if (selectedCourses.length === 0) {
+              throw new Error('Please select at least one course to save.');
+            }
+            
+            console.log('Selected courses:', selectedCourses);
+            
+            // Create a hidden input for courses data
+            const coursesInput = document.createElement('input');
+            coursesInput.type = 'hidden';
+            coursesInput.name = 'courses';
+            coursesInput.value = JSON.stringify(selectedCourses);
+            form.appendChild(coursesInput);
+            
+            // Submit the form normally to allow for proper redirect handling
+            form.submit();
+            
+          } catch (error) {
+            console.error('Validation error:', error);
+            alert(error.message);
+            return false;
+          }
+        });
+      }
+      
+      // Add Class button handlers
+      document.querySelectorAll('.add-class-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const semester = this.dataset.semester;
+          document.getElementById('modalSemester').value = semester;
+          document.getElementById('modalEditMode').value = 'false';
+          document.getElementById('courseModalLabel').textContent = 'Add New Course';
+          
+          // Clear form fields
+          document.getElementById('ccode').value = '';
+          document.getElementById('cnumber').value = '';
+          document.getElementById('cname').value = '';
+          document.getElementById('credit_hours').value = '3';
+          
+          courseModal.show();
+        });
+      });
+
+      // Handle input validation
+      document.querySelectorAll('.course-code-input').forEach(input => {
+        input.addEventListener('input', function() {
+          this.value = this.value.toUpperCase();
+        });
+      });
+
+      document.querySelectorAll('.course-number-input').forEach(input => {
+        input.addEventListener('change', function() {
+          if (!/^\d{3}[A-Z]?$/.test(this.value)) {
+            alert('Please enter a valid course number (3 digits, optional letter)');
+            this.value = this.dataset.original;
+          }
+        });
+      });
+
+      document.querySelectorAll('.course-hours-input').forEach(input => {
+        input.addEventListener('change', function() {
+          const hours = parseFloat(this.value);
+          if (isNaN(hours) || hours < 0 || hours > 12) {
+            alert('Please enter valid credit hours (0-12)');
+            this.value = this.dataset.original;
+          }
+        });
+      });
+      
+      // Edit course button handlers
+      document.querySelectorAll('.edit-course-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const semester = this.dataset.semester;
+          const ccode = this.dataset.ccode;
+          const cnumber = this.dataset.cnumber;
+          const cname = this.dataset.cname;
+          const creditHours = this.dataset.creditHours;
+          
+          document.getElementById('modalSemester').value = semester;
+          document.getElementById('modalEditMode').value = 'true';
+          document.getElementById('courseModalLabel').textContent = 'Edit Course';
+          
+          document.getElementById('ccode').value = ccode;
+          document.getElementById('cnumber').value = cnumber;
+          document.getElementById('cname').value = cname;
+          document.getElementById('credit_hours').value = creditHours;
+          
+          courseModal.show();
+        });
+      });
+
+      // Add course matching functionality
+      async function fetchDegreeRequirements() {
+        try {
+          const response = await fetch(`/students/${current_student_login}/degree_requirements`);
+          const data = await response.json();
+          return data.courses;
+        } catch (error) {
+          console.error('Error fetching degree requirements:', error);
+          return [];
+        }
+      }
+
+      function findMatchingCourse(courseCode, courseNumber, courseName, degreeRequirements) {
+        // First try exact match
+        const exactMatch = degreeRequirements.find(req => 
+          req.ccode === courseCode && 
+          req.cnumber === courseNumber
+        );
+        
+        if (exactMatch) {
+          return exactMatch;
+        }
+
+        // Try fuzzy match on course name if no exact match
+        const fuzzyMatch = degreeRequirements.find(req => {
+          if (req.ccode !== courseCode || req.cnumber !== courseNumber) {
+            return false;
+          }
+          
+          // Simple fuzzy match - compare lowercase and remove special characters
+          const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const normalizedInput = normalize(courseName);
+          const normalizedReq = normalize(req.cname);
+          
+          return normalizedInput.includes(normalizedReq) || 
+                 normalizedReq.includes(normalizedInput);
+        });
+
+        return fuzzyMatch;
+      }
+
+      async function standardizeCourseNames() {
+        const degreeRequirements = await fetchDegreeRequirements();
+        if (!degreeRequirements || degreeRequirements.length === 0) {
+          console.log('No degree requirements found');
+          return;
+        }
+
+        document.querySelectorAll('tbody tr').forEach(row => {
+          const codeInput = row.querySelector('.course-code-input');
+          const numberInput = row.querySelector('.course-number-input');
+          const nameInput = row.querySelector('.course-name-input');
+          
+          if (!codeInput || !numberInput || !nameInput) return;
+
+          const courseCode = codeInput.value.trim().toUpperCase();
+          const courseNumber = numberInput.value.trim();
+          const courseName = nameInput.value.trim();
+
+          const match = findMatchingCourse(courseCode, courseNumber, courseName, degreeRequirements);
+          if (match) {
+            // Update course name if it's different
+            if (match.cname !== courseName) {
+              nameInput.value = match.cname;
+              nameInput.dataset.original = match.cname;
+              
+              // Add visual feedback
+              nameInput.style.backgroundColor = '#e8f5e9';
+              setTimeout(() => {
+                nameInput.style.backgroundColor = '';
+              }, 2000);
+
+              // Trigger save if auto-save is enabled
+              const event = new Event('change');
+              nameInput.dispatchEvent(event);
+            }
+
+            // Add tooltip showing this is a required course
+            const tooltip = document.createElement('div');
+            tooltip.className = 'required-course-tooltip';
+            tooltip.innerHTML = `
+              <i class="fas fa-check-circle text-success"></i>
+              Required for your degree
+            `;
+            row.querySelector('td:last-child').appendChild(tooltip);
+          }
+        });
+      }
+
+      // Add styles for the tooltip
+      const style = document.createElement('style');
+      style.textContent = `
+        .required-course-tooltip {
+          font-size: 0.8rem;
+          color: #198754;
+          margin-top: 0.25rem;
+        }
+        .course-name-input.matched {
+          border-color: #198754;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Call standardization when page loads and after any course changes
+      standardizeCourseNames();
+
+      // Add event listener for course changes
+      document.querySelectorAll('.course-code-input, .course-number-input').forEach(input => {
+        input.addEventListener('change', () => {
+          standardizeCourseNames();
+        });
+      });
+    });
+  </script>
+<% end %>
