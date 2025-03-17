@@ -21,6 +21,7 @@ module CleoCourseScheduler
     # python_path = `which python3`.strip
     # python_path = '/usr/bin/python3' if python_path.empty?
 
+    puts "Initializing PyCall with Python3..."
     PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
 
     # Ensure pdfplumber is available
