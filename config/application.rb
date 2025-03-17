@@ -12,7 +12,6 @@ Bundler.require(*Rails.groups)
 
 require 'pycall'
 
-puts "PyCall Python Executable: #{PyCall::EXECUTABLE}"
 puts "PyCall Python Version: #{PyCall.builtins.eval('import sys; sys.version')}"
 puts "PyCall Python Path: #{PyCall.builtins.eval('import sys; sys.executable')}"
 puts "PyCall Python Site-Packages: #{PyCall.builtins.eval('import sys; print(sys.path)')}"
