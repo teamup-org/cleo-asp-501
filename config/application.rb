@@ -24,6 +24,14 @@ module CleoCourseScheduler
 
     PyCall.init(python_path) # Change this if needed (`which python3` in terminal)
 
+    require 'pycall'
+
+    puts "PyCall Python Executable: #{PyCall::PythonInterpreter.executable}"
+    puts "PyCall Python Version: #{PyCall.builtins.eval('import sys; sys.version')}"
+    puts "PyCall Python Path: #{PyCall.builtins.eval('import sys; sys.executable')}"
+    puts "PyCall Python Site-Packages: #{PyCall.builtins.eval('import sys; print(sys.path)')}"
+    puts "PyCall Python Version Info: #{PyCall.builtins.eval('import sys; print(sys.version_info)')}"    
+
     # Ensure pdfplumber is available
     begin
       PyCall.builtins.exec("import pdfplumber")
