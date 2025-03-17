@@ -11,7 +11,12 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 require 'pycall'
-puts PyCall::PythonInterpreter.executable
+
+puts "PyCall Python Executable: #{PyCall::EXECUTABLE}"
+puts "PyCall Python Version: #{PyCall.builtins.eval('import sys; sys.version')}"
+puts "PyCall Python Path: #{PyCall.builtins.eval('import sys; sys.executable')}"
+puts "PyCall Python Site-Packages: #{PyCall.builtins.eval('import sys; print(sys.path)')}"
+puts "PyCall Python Version Info: #{PyCall.builtins.eval('import sys; print(sys.version_info)')}"
 
 module CleoCourseScheduler
   class Application < Rails::Application
@@ -24,20 +29,17 @@ module CleoCourseScheduler
 
     PyCall.init(python_path) # Change this if needed (`which python3` in terminal)
 
-    require 'pycall'
-
-    puts "PyCall Python Executable: #{PyCall::PythonInterpreter.executable}"
-    puts "PyCall Python Version: #{PyCall.builtins.eval('import sys; sys.version')}"
-    puts "PyCall Python Path: #{PyCall.builtins.eval('import sys; sys.executable')}"
-    puts "PyCall Python Site-Packages: #{PyCall.builtins.eval('import sys; print(sys.path)')}"
-    puts "PyCall Python Version Info: #{PyCall.builtins.eval('import sys; print(sys.version_info)')}"    
-
     # Ensure pdfplumber is available
     begin
-      PyCall.builtins.exec("import pdfplumber")
-    rescue PyCall::PyError
-      puts "Installing pdfplumber..."
-      PyCall.builtins.exec("import pip; pip.main(['install', 'pdfplumber'])")
+      PyCall.builtins.eval("import pdfplumber")
+    rescue StandardError => e
+      puts "Error importing pdfplumber: #{e.message}"
+      puts "Attempting to install pdfplumber..."
+      begin
+        PyCall.builtins.eval("import pip; pip.main(['install', 'pdfplumber'])")
+      rescue StandardError => install_error
+        puts "Failed to install pdfplumber: #{install_error.message}"
+      end
     end
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
