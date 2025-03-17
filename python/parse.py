@@ -22,7 +22,7 @@ try:
 except ModuleNotFoundError:
     print("pdfplumber not found. Installing...")
     subprocess.check_call([sys.executable, "pip", "install", "pdfplumber"])
-    output = subprocess.check_output(["pip", "list"], text=True)
+    output = subprocess.check_output(["ls"], text=True)
     logger.info(output)
     import pdfplumber  # Try importing again after installation
     logger.info("pdfplumber is installed and ready to use! - low\n\n")
