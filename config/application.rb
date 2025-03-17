@@ -19,7 +19,8 @@ module CleoCourseScheduler
 
     # Ensure PyCall uses the correct Python version
 
-    PyCall.init('/home/render/envwrappers/python3')
+    PyCall.sys.path.append('/home/render/envwrappers/python3/lib/python3.*/site-packages')
+    PyCall.init('/home/render/envwrappers/python3/bin/python3')
 
     # Ensure pdfplumber is available
     begin
