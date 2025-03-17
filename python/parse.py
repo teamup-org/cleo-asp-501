@@ -1,6 +1,4 @@
 import sys
-sys.path.append('/opt/render/.python/lib/python3.x/site-packages')  # Adjust path if needed
-import pdfplumber
 import re
 import sys
 import json
@@ -14,6 +12,11 @@ logging.basicConfig(
     stream=sys.stderr
 )
 logger = logging.getLogger(__name__)
+
+logger.log(sys.path)  # Log the current Python path for debugging
+
+sys.path.append('/opt/render/.python/lib/python3.x/site-packages')  # Adjust path if needed
+import pdfplumber
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """Extracts text from a given PDF file."""
