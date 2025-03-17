@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import logging
+import subprocess
 from typing import List, Dict, Any, Optional
 
 # Configure logging to output to stderr for Rails to capture
@@ -15,8 +16,16 @@ logger = logging.getLogger(__name__)
 
 logger.info(sys.path)  # Log the current Python path for debugging
 
-sys.path.append('/opt/render/.python/lib/python3.x/site-packages')  # Adjust path if needed
-import pdfplumber
+try:
+    import pdfplumber
+    print("pdfplumber is installed and ready to use! - high")
+except ModuleNotFoundError:
+    print("pdfplumber not found. Installing...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pdfplumber"])
+    import pdfplumber  # Try importing again after installation
+    print("pdfplumber is installed and ready to use! - low")
+
+
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """Extracts text from a given PDF file."""
