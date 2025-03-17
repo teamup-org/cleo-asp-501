@@ -18,12 +18,14 @@ logger.info(sys.path)  # Log the current Python path for debugging
 
 try:
     import pdfplumber
-    print("pdfplumber is installed and ready to use! - high")
+    logger.info("pdfplumber is installed and ready to use! - high\n\n")
 except ModuleNotFoundError:
     print("pdfplumber not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pdfplumber"])
+    subprocess.check_call([sys.executable, "pip", "install", "pdfplumber"])
+    output = subprocess.check_output(["pip", "list"], text=True)
+    logger.info(output)
     import pdfplumber  # Try importing again after installation
-    print("pdfplumber is installed and ready to use! - low")
+    logger.info("pdfplumber is installed and ready to use! - low\n\n")
 
 
 
