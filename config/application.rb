@@ -4,14 +4,38 @@ require_relative 'boot'
 
 require 'rails/all'
 
+# require 'dotenv/load'
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+
+require 'pycall'
 
 module CleoCourseScheduler
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
+
+    # Ensure PyCall uses the correct Python version
+    # python_path = `which python3`.strip
+    # python_path = '/usr/bin/python3' if python_path.empty?
+
+    puts "Initializing PyCall with Python3..."
+    PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
+
+    # Ensure pdfplumber is available
+    begin
+      PyCall.builtins.eval("import pdfplumber")
+    rescue StandardError => e
+      puts "Error importing pdfplumber: #{e.message}"
+      puts "Attempting to install pdfplumber..."
+      begin
+        PyCall.builtins.eval("import pip; pip.main(['install', 'pdfplumber'])")
+      rescue StandardError => install_error
+        puts "Failed to install pdfplumber: #{install_error.message}"
+      end
+    end
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.

@@ -238,6 +238,7 @@ GEM
     public_suffix (6.0.1)
     puma (6.4.3)
       nio4r (~> 2.0)
+    pycall (1.5.2)
     racc (1.8.1)
     rack (3.1.8)
     rack-protection (4.0.0)
@@ -442,6 +443,7 @@ DEPENDENCIES
   pg (~> 1.1)
   prawn
   puma (>= 5.0)
+  pycall
   rails (~> 7.2.1)
   rails-controller-testing
   rexml
