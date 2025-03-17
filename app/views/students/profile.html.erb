@@ -1,4 +1,4 @@
-
+<!-- filepath: /Users/alyantharani/Desktop/Academics/CSCE-431/cleo-asp-501/app/views/students/profile.html.erb -->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +21,26 @@
     <p class="profile-info"><strong>Graduation Semester:</strong> <%= @student.grad_semester.humanize %></p>
     <p class="profile-info"><strong>Major:</strong> <%= @student.major.mname if @student.major %></p> 
     <p class="profile-info"><strong>Emphasis:</strong> <%= @student.emphasis.ename if @student.emphasis %></p>
+
+    <!-- Transcript Section -->
+    <div class="transcript-section mt-4">
+      <h4 class="text-dark font-weight-bolder mb-3">Transcript Management</h4>
+      
+      <div class="d-flex gap-3 mb-4">
+        <!-- View/Edit Transcript Button -->
+        <%= link_to view_transcript_courses_student_path(current_student_login), 
+            class: "btn btn-primary d-flex align-items-center" do %>
+          <i class="fas fa-edit me-2"></i> View/Edit Transcript
+        <% end %>
+        
+        <!-- Upload New Transcript -->
+        <%= form_with url: upload_transcript_student_path(@student), local: true, 
+            html: { multipart: true, class: 'd-flex gap-2 align-items-center flex-grow-1' } do |form| %>
+          <%= form.file_field :transcript, class: "form-control", accept: "application/pdf" %>
+          <%= form.submit "Upload New Transcript", class: "btn btn-success" %>
+        <% end %>
+      </div>
+    </div>
    
     <!-- Credits Scale -->
     <h4 class="text-dark text-left mt-4 font-weight-bolder">Track Your Progress</h4>
@@ -30,9 +50,7 @@
         <span>126</span>
       </div>
       <div class="credits-scale-bar">
-        
-      <div class="credits-scale-fill" style="width: <%= ((@student.total_credits_completed || 0) / 126.0 * 100).round(2) %>%"></div>
-
+        <div class="credits-scale-fill" style="width: <%= ((@student.total_credits_completed || 0) / 126.0 * 100).round(2) %>%"></div>
       </div>
       <div class="credits-scale-markers">
         <span>Year 0</span>
@@ -41,8 +59,6 @@
         <span>Year 3</span>
         <span>Year 4</span>
       </div>
-
-      
     </div>
 
     <%= link_to 'Edit Profile', edit_student_path(@student.google_id), class: 'profile-edit-link' %> 
@@ -67,6 +83,4 @@
       });
     });
   </script>
-  
 </body>
-
