@@ -10,7 +10,8 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-require 'pycall'  # Add this to require PyCall
+require 'pycall'
+puts PyCall::PythonInterpreter.executable
 
 module CleoCourseScheduler
   class Application < Rails::Application
@@ -18,7 +19,10 @@ module CleoCourseScheduler
     config.load_defaults 7.2
 
     # Ensure PyCall uses the correct Python version
-    PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
+    python_path = `which python3`.strip
+    python_path = '/usr/bin/python3' if python_path.empty?
+
+    PyCall.init(python_path) # Change this if needed (`which python3` in terminal)
 
     # Ensure pdfplumber is available
     begin
