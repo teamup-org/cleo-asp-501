@@ -35,6 +35,12 @@ class Course < ApplicationRecord
 
   has_many :degree_requirements
 
+  # GPA history association
+  has_many :prof_histories, dependent: :destroy
+
+  # Section association
+  has_many :sections, dependent: :destroy
+
   def prerequisite_groups
     prerequisites.includes(:prereq).group_by(&:equi_id).transform_values { |prereqs| prereqs.map(&:prereq) }
   end
