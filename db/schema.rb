@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -223,6 +225,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_transcripts", force: :cascade do |t|
+    t.string "uin"
+    t.binary "transcript"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "course_core_categories", "core_categories"
   add_foreign_key "course_core_categories", "courses"
   add_foreign_key "course_emphases", "courses"
@@ -244,4 +253,5 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
   add_foreign_key "sections", "courses"
   add_foreign_key "student_courses", "students", primary_key: "google_id"
   add_foreign_key "student_infos", "students", column: "uin", primary_key: "google_id"
+  add_foreign_key "user_transcripts", "students", column: "uin", primary_key: "google_id"
 end

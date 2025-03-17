@@ -27,7 +27,7 @@ gem 'sassc-rails'
 gem 'pycall'
 
 group :development, :test do
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "debug", platforms: %i[ mingw mswin mswin64 jruby ], require: "debug/prelude"
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
   gem "rspec-rails", "~> 7.0.0"
