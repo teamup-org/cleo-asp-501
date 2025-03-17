@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 # logger.info(sys.path)  # Log the current Python path for debugging
 
 sys.path.insert(0, os.path.dirname(__file__))  # Add the current directory to the Python path
+logger.info(sys.path)  # Log the updated
 import pdfplumber
 
 def extract_text_from_pdf(pdf_path: str) -> str:
