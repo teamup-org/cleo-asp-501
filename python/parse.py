@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/opt/render/.python/lib/python3.x/site-packages')  # Adjust path if needed
 import pdfplumber
 import re
 import sys
