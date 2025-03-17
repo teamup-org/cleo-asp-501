@@ -18,9 +18,10 @@ module CleoCourseScheduler
     config.load_defaults 7.2
 
     # Ensure PyCall uses the correct Python version
+    # python_path = `which python3`.strip
+    # python_path = '/usr/bin/python3' if python_path.empty?
 
-    PyCall.sys.path.append('/home/render/envwrappers/python3/lib/python3.*/site-packages')
-    PyCall.init('/home/render/envwrappers/python3/bin/python3')
+    PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
 
     # Ensure pdfplumber is available
     begin
