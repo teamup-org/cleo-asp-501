@@ -16,18 +16,10 @@ logger = logging.getLogger(__name__)
 
 logger.info(sys.path)  # Log the current Python path for debugging
 
-try:
-    import pdfplumber
-    logger.info("pdfplumber is installed and ready to use! - high\n\n")
-except ModuleNotFoundError:
-    print("pdfplumber not found. Installing...")
-    # subprocess.check_call([sys.executable, "pip", "install", "pdfplumber"])
-    output = subprocess.check_output(["ls"], text=True)
-    logger.info(output)
-    import pdfplumber  # Try importing again after installation
-    logger.info("pdfplumber is installed and ready to use! - low\n\n")
 
-
+output = subprocess.check_output(["ls"], text=True)
+logger.info(output)
+import pdfplumber
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """Extracts text from a given PDF file."""
