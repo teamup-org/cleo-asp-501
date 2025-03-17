@@ -1,9 +1,9 @@
 import sys
+import os
 import re
 import sys
 import json
 import logging
-import subprocess
 from typing import List, Dict, Any, Optional
 
 # Configure logging to output to stderr for Rails to capture
@@ -14,11 +14,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-logger.info(sys.path)  # Log the current Python path for debugging
+# logger.info(sys.path)  # Log the current Python path for debugging
 
-
-output = subprocess.check_output(["ls"], text=True)
-logger.info(output)
+sys.path.insert(0, os.path.dirname(__file__))  # Add the current directory to the Python path
 import pdfplumber
 
 def extract_text_from_pdf(pdf_path: str) -> str:
