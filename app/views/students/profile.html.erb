@@ -21,6 +21,11 @@
     <p class="profile-info"><strong>Graduation Semester:</strong> <%= @student.grad_semester.humanize %></p>
     <p class="profile-info"><strong>Major:</strong> <%= @student.major.mname if @student.major %></p> 
     <p class="profile-info"><strong>Emphasis:</strong> <%= @student.emphasis.ename if @student.emphasis %></p>
+    <p class="profile-info"><strong>Preferred Time:</strong> <%= @student.student_info&.preferred_time.presence%></p>
+    <p class="profile-info"><strong>Preferred Location:</strong> <%= @student.student_info&.preferred_loc.presence%></p>
+    <p class="profile-info"><strong>FERPA Consent:</strong> <%= @student.student_info&.ferpa_consent ? 'Consent Given' : 'No Consent' %></p>
+
+
 
     <!-- Transcript Section -->
     <div class="transcript-section mt-4">
