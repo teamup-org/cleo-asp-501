@@ -12,7 +12,7 @@ class SupportController < ApplicationController
   def viewDefaultPlan; end
 
   def buildPlan; end
-
+  def help; end
   private
 
   def set_student
