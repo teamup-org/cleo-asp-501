@@ -78,6 +78,30 @@
     <%= form.collection_select :grad_semester, Student.grad_semesters.keys.map { |k| [k.humanize, k] }, :second, :first, { prompt: "Select Grad Semester" }, class: 'studentinfo_select' %>
   </div>
 
+  <% if @student.persisted? && @student.student_info.present? %>
+    <%= form.fields_for :student_info do |s_info_form| %>
+      <div class="studentinfo_field">
+        <%= s_info_form.label :preferred_time, 'Preferred Time', class: 'studentinfo_label bold' %>
+        <span class="studentinfo_field_description">Select your preferred time for classes</span>
+        <%= s_info_form.select :preferred_time, StudentInfo::PREFERRED_TIMES, { prompt: "Select Preferred Time" }, class: 'studentinfo_select' %>
+      </div>
+
+      <div class="studentinfo_field">
+        <%= s_info_form.label :preferred_loc, 'Preferred Location', class: 'studentinfo_label bold' %>
+        <span class="studentinfo_field_description">Select your preferred location for classes</span>
+        <%= s_info_form.select :preferred_loc, StudentInfo::PREFERRED_LOCATIONS, { prompt: "Select Preferred Location" }, class: 'studentinfo_select' %>
+      </div>
+
+      <div class="studentinfo_field">
+        <%= s_info_form.label :ferpa_consent, 'FERPA Consent', class: 'studentinfo_label bold' %>
+        <%= s_info_form.check_box :ferpa_consent, {}, true, false %> <!-- true for checked, false for unchecked -->
+        <span class="studentinfo_field_description">Check this box if you consent to the FERPA regulations.</span>
+      </div>
+    <% end %>
+  <% end %>
+
+
+
   <div class="studentinfo_submit">
     <%= form.submit @student.new_record? ? 'Create Student' : 'Update Student Information', class: 'studentinfo_submit_button' %>
   </div>
