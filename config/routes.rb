@@ -57,6 +57,7 @@ Rails.application.routes.draw do
         get 'enrollCourses'
         get 'tracks'
         get 'users'
+        get 'help'
       end
     end
 
