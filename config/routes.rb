@@ -57,7 +57,6 @@ Rails.application.routes.draw do
         get 'enrollCourses'
         get 'tracks'
         get 'users'
-        get 'help'
       end
     end
 
@@ -114,6 +113,7 @@ Rails.application.routes.draw do
       get 'buildPlan'
       get 'profile'
       get 'viewDefaultPlan'
+      get 'help'
     end
   end
 
