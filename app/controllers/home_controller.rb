@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
 class HomeController < ApplicationController
-  def index; end
+  def index
+    @greeting = PythonService.hello("Rails User")
+  end
 end
