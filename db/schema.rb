@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_26_203159) do
+
+ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -63,6 +65,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_203159) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "ccode", limit: 30
+    t.boolean "uploaded_via_transcript"
     t.index ["ccode", "cnumber"], name: "index_courses_on_ccode_and_cnumber", unique: true
   end
 
@@ -119,15 +122,71 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_203159) do
     t.index ["prereq_id"], name: "index_prerequisites_on_prereq_id"
   end
 
+  create_table "prev_student_courses", force: :cascade do |t|
+    t.string "uin", null: false
+    t.integer "course_id", null: false
+    t.string "semester", null: false
+    t.string "grade"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "prof_histories", force: :cascade do |t|
+    t.integer "course_id", null: false
+    t.string "teacher_name"
+    t.decimal "average_gpa", precision: 4, scale: 3
+    t.string "semester", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "teacher_name", "semester"], name: "idx_on_course_id_teacher_name_semester_82717e8436", unique: true
+  end
+
+  create_table "rec_courses", force: :cascade do |t|
+    t.integer "course_id", null: false
+    t.string "semester", null: false
+    t.string "uin", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "section_attributes", force: :cascade do |t|
+    t.text "attribute_name"
+    t.integer "section_number", null: false
+    t.integer "course_id", null: false
+    t.integer "attribute_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["section_number", "course_id", "attribute_id"], name: "idx_on_section_number_course_id_attribute_id_cda527b0ce", unique: true
+  end
+
+  create_table "sections", primary_key: "section_number", force: :cascade do |t|
+    t.integer "start_time"
+    t.integer "end_time"
+    t.integer "course_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["section_number", "course_id"], name: "index_sections_on_section_number_and_course_id", unique: true
+  end
+
   create_table "student_courses", id: false, force: :cascade do |t|
     t.string "student_id", null: false
     t.bigint "course_id", null: false
     t.integer "sem", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "uploaded_via_transcript", default: false
     t.index ["course_id"], name: "index_student_courses_on_course_id"
     t.index ["student_id", "course_id"], name: "index_student_courses_on_student_id_and_course_id", unique: true
     t.index ["student_id"], name: "index_student_courses_on_student_id"
+  end
+
+  create_table "student_infos", primary_key: "uin", id: :string, force: :cascade do |t|
+    t.boolean "ferpa_consent"
+    t.string "preferred_time"
+    t.string "preferred_loc"
+    t.decimal "current_gpa", precision: 3, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "student_logins", force: :cascade do |t|
@@ -166,6 +225,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_203159) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_transcripts", force: :cascade do |t|
+    t.string "uin"
+    t.binary "transcript"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "course_core_categories", "core_categories"
   add_foreign_key "course_core_categories", "courses"
   add_foreign_key "course_emphases", "courses"
@@ -178,5 +244,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_203159) do
   add_foreign_key "degree_requirements", "majors"
   add_foreign_key "prerequisites", "courses"
   add_foreign_key "prerequisites", "courses", column: "prereq_id"
+  add_foreign_key "prev_student_courses", "courses"
+  add_foreign_key "prev_student_courses", "students", column: "uin", primary_key: "google_id"
+  add_foreign_key "prof_histories", "courses"
+  add_foreign_key "rec_courses", "courses"
+  add_foreign_key "rec_courses", "students", column: "uin", primary_key: "google_id"
+  add_foreign_key "section_attributes", "sections", column: ["section_number", "course_id"], primary_key: ["section_number", "course_id"]
+  add_foreign_key "sections", "courses"
   add_foreign_key "student_courses", "students", primary_key: "google_id"
+  add_foreign_key "student_infos", "students", column: "uin", primary_key: "google_id"
+  add_foreign_key "user_transcripts", "students", column: "uin", primary_key: "google_id"
 end

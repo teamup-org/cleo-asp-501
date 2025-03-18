@@ -62,8 +62,16 @@ node_modules/
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+yarn.lock
 
 # Ignore uploaded files in development
 /storage/*
 !/storage/.keep
 /public/uploadscoverage
+
+# dup
+/config/master.key
+
+#For Macbook Development
+.DS_Store
+
