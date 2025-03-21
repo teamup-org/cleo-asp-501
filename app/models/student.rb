@@ -32,7 +32,7 @@ class Student < ApplicationRecord
   has_many :courses, through: :student_courses
   has_many :user_transcripts, primary_key: "google_id", foreign_key: :uin
   has_many :rec_courses, primary_key: "google_id", foreign_key: :uin
-  has_one :student_info, primary_key: "google_id", foreign_key: :uin
+  #has_one :student_info, primary_key: "google_id", foreign_key: :uin
 
   belongs_to :major
 
