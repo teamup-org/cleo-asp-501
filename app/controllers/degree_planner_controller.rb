@@ -13,6 +13,13 @@ class DegreePlannerController < ApplicationController
     @emphasis_options = Emphasis.all.pluck(:ename)
     @track_options = Track.all.pluck(:tname)
     
+    # Check if I am missing a required class
+    missing_prereqs = @course_prerequisite_status.select { |status| !status[:prerequisites_met] }
+    if missing_prereqs.any?
+      flash[:error] = "You are missing prerequisites for the following courses: " +
+                      missing_prereqs.map { |status| status[:student_course].course.cname }.join(', ')
+    end
+
   end
 
   def add_course
@@ -46,11 +53,17 @@ class DegreePlannerController < ApplicationController
   end
 
   def update_plan
+
+    puts("Updating plan with params: #{params.inspect}")
+
     selected_course_id = params[:add_course].to_i
     semester = params[:sem].to_i
 
     if selected_course_id.positive? && semester.between?(1, 8)
+      puts("ran here")
       student_course = StudentCourse.new(student_id: @student.id, course_id: selected_course_id, sem: semester)
+
+
 
       if student_course.save
         flash[:success] = 'Course added successfully!'
