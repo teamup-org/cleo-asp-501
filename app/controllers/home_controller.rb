@@ -2,6 +2,7 @@
 
 class HomeController < ApplicationController
   def index
-    @greeting = PythonService.hello("Rails User")
+    #@greeting = PythonService.hello("Rails User")
+    @greeting = "Hello from Rails"
   end
 end

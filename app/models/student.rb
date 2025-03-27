@@ -25,11 +25,14 @@ class Student < ApplicationRecord
 
   # Student courses association
   # has_and_belongs_to_many :courses
+  has_one :student_info, foreign_key: 'uin', primary_key: 'google_id', dependent: :destroy #NEW
+  accepts_nested_attributes_for :student_info #NEW
+
   has_many :student_courses, dependent: :destroy
   has_many :courses, through: :student_courses
   has_many :user_transcripts, primary_key: "google_id", foreign_key: :uin
   has_many :rec_courses, primary_key: "google_id", foreign_key: :uin
-  has_one :student_info, primary_key: "google_id", foreign_key: :uin
+  #has_one :student_info, primary_key: "google_id", foreign_key: :uin
 
   belongs_to :major
 

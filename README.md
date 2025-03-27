@@ -172,6 +172,25 @@ Continuous integration was employed through the use of Github actions. Our workf
 - Rubocop linting
 - Brakeman tests
 
+## How to test
+### Creating a new account
+To create an account click on the `Login with Google` button on the landing page, then click an account, if it has never been used before a new account will be created with that email.
+
+### How to upload your unofficial transcript
+After login, click `Profile` -> `Choose File` (choose a your saved transcript.pdf) -> click `Upload New Transcript`.
+You should then be able to change class names and unselect classes to fix any errors with the gathered classes.
+
+### How to see a generic degree planner
+After login, click `View Default Degree Plan`
+
+### How to update user information
+After login, click `Profile` -> `Edit Profile` then the user should be able to change any of the drop down items as well as give FERPA consent. Once clicking, the user can change any of the fields then click `Save Changes`. 
+The user should see a green banner at the top saying changes are saved and the current user preferences should be shown on the left of the student profile.
+
+### How to access help
+After login, click on the 3 bars in the top left corner -> `Support/Help` -> `Help Page`. Here you show find some frequently asked questions as well as a link the the `CLEO Github` which contains our README.
+
+
 ## Support
 The support of the application will close on May 6th.
 
