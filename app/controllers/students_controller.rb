@@ -186,34 +186,16 @@ class StudentsController < ApplicationController
 
   def save_transcript_courses
     begin
-      # Log the incoming parameters
-      Rails.logger.info("Received params: #{params.inspect}")
-
-      unless params[:courses].present?
-        flash[:alert] = "No course data provided"
-        redirect_to view_transcript_courses_student_path(current_student_login)
-        return
-      end
-      
+      # Assume params[:courses] contains your JSON data
       courses = JSON.parse(params[:courses])
-      Rails.logger.info("Processing #{courses.length} courses: #{courses.inspect}")
-      
-      if courses.empty?
-        flash[:alert] = "No courses were selected to save."
-        redirect_to view_transcript_courses_student_path(current_student_login)
-        return
-      end
-      
-      saved_count = 0
-      failed_courses = []
-      
+      raise "No courses provided" if courses.empty?
+
       ActiveRecord::Base.transaction do
-        # First, remove all existing courses for this student
+        # Optionally clear existing transcript courses for this student
         PrevStudentCourse.where(uin: current_student_login.uid).destroy_all
-        Rails.logger.info("Cleared existing courses for student #{current_student_login.uid}")
-        
+
         courses.each do |course_data|
-          # Find or create the course
+          # Find or create a Course record if necessary
           db_course = Course.find_or_create_by(
             ccode: course_data['ccode'].upcase,
             cnumber: course_data['cnumber']
@@ -222,46 +204,25 @@ class StudentsController < ApplicationController
             c.credit_hours = course_data['credit_hours']
             c.uploaded_via_transcript = true
           end
-          
-          # Create the student course record
-          prev_course = PrevStudentCourse.new(
+
+          # Insert the transcript course into the prev_student_courses table
+          prev_course = PrevStudentCourse.create!(
             uin: current_student_login.uid,
             course_id: db_course.id,
             semester: course_data['semester'],
             uploaded_via_transcript: true
           )
-          
-          if prev_course.save
-            saved_count += 1
-            Rails.logger.info("Saved course #{db_course.ccode} #{db_course.cnumber} for semester #{course_data['semester']}")
-          else
-            Rails.logger.error("Failed to save student course: #{prev_course.errors.full_messages.join(', ')}")
-            failed_courses << "#{course_data['ccode']} #{course_data['cnumber']}"
-          end
         end
+      end
 
-        if saved_count == 0
-          raise ActiveRecord::Rollback, "No courses were saved successfully"
-        end
-      end
-      
-      if saved_count > 0
-        flash[:success] = "Successfully saved #{saved_count} courses!"
-        flash[:notice] = "Failed to save: #{failed_courses.join(', ')}" if failed_courses.any?
-      else
-        flash[:alert] = "Failed to save any courses. Please try again."
-      end
-      
+      flash[:success] = "Transcript courses saved successfully."
       redirect_to view_transcript_courses_student_path(current_student_login)
-      
     rescue JSON::ParserError => e
       Rails.logger.error "JSON parse error: #{e.message}"
-      Rails.logger.error "Params: #{params.inspect}"
       flash[:alert] = "Invalid course data provided. Please try again."
       redirect_to view_transcript_courses_student_path(current_student_login)
     rescue StandardError => e
-      Rails.logger.error "Error saving courses: #{e.message}"
-      Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
+      Rails.logger.error "Error saving courses: #{e.message}\n#{e.backtrace.join("\n")}"
       flash[:alert] = "An error occurred while saving the courses. Please try again."
       redirect_to view_transcript_courses_student_path(current_student_login)
     end
