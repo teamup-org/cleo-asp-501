@@ -10,9 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
-
+ActiveRecord::Schema[7.2].define(version: 2025_03_07_163019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -65,7 +63,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "ccode", limit: 30
-    t.boolean "uploaded_via_transcript"
     t.index ["ccode", "cnumber"], name: "index_courses_on_ccode_and_cnumber", unique: true
   end
 
@@ -174,7 +171,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_06_165149) do
     t.integer "sem", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "uploaded_via_transcript", default: false
     t.index ["course_id"], name: "index_student_courses_on_course_id"
     t.index ["student_id", "course_id"], name: "index_student_courses_on_student_id_and_course_id", unique: true
     t.index ["student_id"], name: "index_student_courses_on_student_id"

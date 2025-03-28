@@ -28,11 +28,17 @@ class StudentsController < ApplicationController
       track_id: params[:track_id],
       emphasis_id: params[:emphasis_id]
     )
+
+    #@student.build_student_info if @student.student_info.nil? #NEW
   end
 
   def create
     @student = Student.new(student_params)
+
     if @student.save
+      if @student.student_info.nil?
+        @student.build_student_info(uin: @student.google_id) # Skips validations on creation
+      end
       # Query the DegreeRequirements table based on the student's major_id
       degree_requirements = DegreeRequirement.where(major_id: @student.major_id)
 
@@ -51,7 +57,10 @@ class StudentsController < ApplicationController
     end
   end
 
-  def edit; end
+  def edit 
+    @student = Student.find_by(google_id: params[:google_id])
+    @student.build_student_info if @student.student_info.nil? #NEW
+  end
 
   def update
     if @student.update(student_params)
@@ -378,6 +387,6 @@ class StudentsController < ApplicationController
 
   def student_params
     params.require(:student).permit(:google_id, :first_name, :last_name, :email, :enrol_year, :grad_year, :enrol_semester,
-                                    :grad_semester, :major_id, :emphasis_id, :track_id)
+                                    :grad_semester, :major_id, :emphasis_id, :track_id, student_info_attributes: [:preferred_time, :preferred_loc, :ferpa_consent]) #NEW
   end
 end

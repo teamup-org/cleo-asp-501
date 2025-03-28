@@ -13,6 +13,8 @@ class SupportController < ApplicationController
 
   def buildPlan; end
 
+  def help; end
+
   private
 
   def set_student

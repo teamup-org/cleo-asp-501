@@ -113,6 +113,7 @@ Rails.application.routes.draw do
       get 'buildPlan'
       get 'profile'
       get 'viewDefaultPlan'
+      get 'help'
     end
   end
 
