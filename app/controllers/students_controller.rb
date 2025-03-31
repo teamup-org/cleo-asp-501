@@ -135,6 +135,7 @@ class StudentsController < ApplicationController
             flash[:alert] = "No courses were found in the transcript."
             log_content = File.read(Rails.root.join('log', 'transcript_parser.log'))
             @parse_error = "Parser returned empty result. Check logs for details."
+            Rails.logger.info("Parsed data preview: #{@parsed_data.first(3).inspect}")
             Rails.logger.error("Parser log: #{log_content}")
           else
             # Group courses by semester for the view
@@ -219,7 +220,7 @@ class StudentsController < ApplicationController
             uin: current_student_login.uid,
             course_id: db_course.id,
             semester: course_data['semester'],
-            uploaded_via_transcript: true
+            #uploaded_via_transcript: true
           )
           
           if prev_course.save
@@ -235,6 +236,9 @@ class StudentsController < ApplicationController
           raise ActiveRecord::Rollback, "No courses were saved successfully"
         end
       end
+
+
+
       
       if saved_count > 0
         flash[:success] = "Successfully saved #{saved_count} courses!"

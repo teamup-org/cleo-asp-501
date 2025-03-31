@@ -67,9 +67,9 @@
       </div>
     </div>
   </div>
-
   <% if @grouped_courses.present? && !@grouped_courses.empty? %>
     <%= form_tag save_transcript_courses_student_path(current_student_login), method: :post, id: 'transcript-form', class: 'transcript-form', data: { turbo: false } do %>
+      <%= hidden_field_tag :courses, @parsed_data.to_json %> <!-- ✅ Added this hidden field -->
       <div class="row">
         <% @grouped_courses.each do |semester, courses| %>
           <div class="col-md-6 mb-4">
@@ -83,8 +83,8 @@
               <div class="card-body">
                 <div class="table-responsive">
                   <table class="table table-hover">
-    <thead>
-      <tr>
+                    <thead>
+                      <tr>
                         <% if params[:action] != 'view_transcript_courses' %>
                           <th style="width: 10%">Include</th>
                         <% end %>
@@ -95,9 +95,9 @@
                         <% if params[:action] == 'view_transcript_courses' %>
                           <th style="width: 20%">Actions</th>
                         <% end %>
-      </tr>
-    </thead>
-    <tbody>
+                      </tr>
+                    </thead>
+                    <tbody>
                       <% courses.each_with_index do |course, index| %>
                         <tr>
                           <% if params[:action] != 'view_transcript_courses' %>
@@ -179,16 +179,23 @@
                               </div>
                             </td>
                           <% end %>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
                 </div>
+                <% if params[:action] == 'view_transcript_courses' && courses.empty? %>
+                  <div class="alert alert-info mb-0" role="alert">
+                    No courses found for this semester. Please add a course.
+                  </div>
+                <% end %>
               </div>
             </div>
           </div>
         <% end %>
       </div>
+
+
 
       <div class="actions sticky-footer">
         <div class="container-fluid px-3">
@@ -634,13 +641,11 @@
           return exactMatch;
         }
 
-        // Try fuzzy match on course name if no exact match
         const fuzzyMatch = degreeRequirements.find(req => {
           if (req.ccode !== courseCode || req.cnumber !== courseNumber) {
             return false;
           }
           
-          // Simple fuzzy match - compare lowercase and remove special characters
           const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
           const normalizedInput = normalize(courseName);
           const normalizedReq = normalize(req.cname);
