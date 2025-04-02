@@ -69,7 +69,7 @@
   </div>
   <% if @grouped_courses.present? && !@grouped_courses.empty? %>
     <%= form_tag save_transcript_courses_student_path(current_student_login), method: :post, id: 'transcript-form', class: 'transcript-form', data: { turbo: false } do %>
-      <%= hidden_field_tag :courses, @parsed_data.to_json %> <!-- ✅ Added this hidden field -->
+      <%= hidden_field_tag :courses, @parsed_data.to_json %>
       <div class="row">
         <% @grouped_courses.each do |semester, courses| %>
           <div class="col-md-6 mb-4">
