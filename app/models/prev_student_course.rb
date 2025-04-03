@@ -15,5 +15,14 @@ class PrevStudentCourse < ApplicationRecord
     
     # Scope to get courses by semester
     scope :by_semester, ->(semester) { where(semester: semester) }
+
+    # Callbacks
+    after_create :remove_from_recommendations
+
+    private
+
+    def remove_from_recommendations
+        RecCourse.where(uin: self.uin, course_id: self.course_id).destroy_all
+    end
 end
   
