@@ -6,6 +6,12 @@
         <% next if message.blank? %>
         <div class="alert alert-<%= type == 'alert' ? 'danger' : (type == 'notice' ? 'info' : 'success') %> alert-dismissible fade show" role="alert">
           <%= message %>
+          <% if type == 'alert' && flash[:error_details].present? %>
+            <div class="mt-2 small">
+              <strong>Error details:</strong>
+              <div class="mt-1"><%= flash[:error_details].html_safe %></div>
+            </div>
+          <% end %>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <% end %>

@@ -207,6 +207,7 @@ class StudentsController < ApplicationController
       
       saved_count = 0
       failed_courses = []
+      error_details = []
       
       ActiveRecord::Base.transaction do
         # First, remove all existing courses for this student
@@ -214,30 +215,56 @@ class StudentsController < ApplicationController
         Rails.logger.info("Cleared existing courses for student #{current_student_login.uid}")
         
         courses.each do |course_data|
-          # Find or create the course
-          db_course = Course.find_or_create_by(
-            ccode: course_data['ccode'].upcase,
-            cnumber: course_data['cnumber']
-          ) do |c|
-            c.cname = course_data['cname']
-            c.credit_hours = course_data['credit_hours']
-            c.uploaded_via_transcript = true
-          end
-          
-          # Create the student course record
-          prev_course = PrevStudentCourse.new(
-            uin: current_student_login.uid,
-            course_id: db_course.id,
-            semester: course_data['semester'],
-            #uploaded_via_transcript: true
-          )
-          
-          if prev_course.save
-            saved_count += 1
-            Rails.logger.info("Saved course #{db_course.ccode} #{db_course.cnumber} for semester #{course_data['semester']}")
-          else
-            Rails.logger.error("Failed to save student course: #{prev_course.errors.full_messages.join(', ')}")
+          begin
+            # Validate required fields
+            unless course_data['ccode'].present? && course_data['cnumber'].present?
+              raise "Missing required fields: Course Code and Course Number are required"
+            end
+
+            # Convert credit hours to integer
+            credit_hours = if course_data['credit_hours'].present?
+                            course_data['credit_hours'].to_i
+                          else
+                            3
+                          end
+
+            # Create or find the course
+            db_course = Course.find_or_initialize_by(
+              ccode: course_data['ccode'].upcase,
+              cnumber: course_data['cnumber']
+            )
+
+            # Set default values if the course is new
+            if db_course.new_record?
+              db_course.cname = course_data['cname'] || "#{course_data['ccode']} #{course_data['cnumber']}"
+              db_course.credit_hours = credit_hours
+              db_course.uploaded_via_transcript = true
+              
+              unless db_course.save
+                raise "Failed to create course: #{db_course.errors.full_messages.join(', ')}"
+              end
+            end
+            
+            # Create the student course record
+            prev_course = PrevStudentCourse.new(
+              uin: current_student_login.uid,
+              course_id: db_course.id,
+              semester: course_data['semester']
+            )
+            
+            if prev_course.save
+              saved_count += 1
+              Rails.logger.info("Saved course #{db_course.ccode} #{db_course.cnumber} for semester #{course_data['semester']}")
+            else
+              error_msg = prev_course.errors.full_messages.join(', ')
+              Rails.logger.error("Failed to save student course: #{error_msg}")
+              failed_courses << "#{course_data['ccode']} #{course_data['cnumber']}"
+              error_details << "#{course_data['ccode']} #{course_data['cnumber']}: #{error_msg}"
+            end
+          rescue StandardError => e
+            Rails.logger.error("Error processing course #{course_data['ccode']} #{course_data['cnumber']}: #{e.message}")
             failed_courses << "#{course_data['ccode']} #{course_data['cnumber']}"
+            error_details << "#{course_data['ccode']} #{course_data['cnumber']}: #{e.message}"
           end
         end
 
@@ -245,15 +272,16 @@ class StudentsController < ApplicationController
           raise ActiveRecord::Rollback, "No courses were saved successfully"
         end
       end
-
-
-
       
       if saved_count > 0
         flash[:success] = "Successfully saved #{saved_count} courses!"
-        flash[:notice] = "Failed to save: #{failed_courses.join(', ')}" if failed_courses.any?
+        if failed_courses.any?
+          flash[:alert] = "Failed to save: #{failed_courses.join(', ')}"
+          flash[:error_details] = error_details.join('<br>')
+        end
       else
         flash[:alert] = "Failed to save any courses. Please try again."
+        flash[:error_details] = error_details.join('<br>')
       end
       
       redirect_to view_transcript_courses_student_path(current_student_login)
@@ -267,6 +295,7 @@ class StudentsController < ApplicationController
       Rails.logger.error "Error saving courses: #{e.message}"
       Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
       flash[:alert] = "An error occurred while saving the courses. Please try again."
+      flash[:error_details] = e.message
       redirect_to view_transcript_courses_student_path(current_student_login)
     end
   end
