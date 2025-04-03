@@ -50,92 +50,84 @@ class Student < ApplicationRecord
   private
 
   def assign_default_courses
-
-    # Define common courses for all students
     common_courses = [
-      { code: "CSCE", number: 181, semester: "FALL", offset: 2 },
-      { code: "CSCE", number: 120, semester: "FALL", offset: 2 },
-      { code: "CSCE", number: 222, semester: "FALL", offset: 2 },
-      { code: "CSCE", number: 221, semester: "SPRING", offset: 3 },
-      { code: "CSCE", number: 312, semester: "SPRING", offset: 3 },
-      { code: "CSCE", number: 314, semester: "SPRING", offset: 3 },
-      { code: "CSCE", number: 313, semester: "FALL", offset: 4 },
-      { code: "CSCE", number: 331, semester: "FALL", offset: 4 },
-      { code: "CSCE", number: 411, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 481, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 399, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 482, semester: "SPRING", offset: 7 },
-      { code: "ENGR", number: 102, semester: "FALL", offset: 0 },
-      { code: "MATH", number: 151, semester: "FALL", offset: 0 },
-      { code: "CHEM", number: 107, semester: "FALL", offset: 0 },
-      { code: "ENGL", number: 104, semester: "FALL", offset: 0 },
-      { code: "ENGR", number: 216, semester: "SPRING", offset: 1 },
-      { code: "PHYS", number: 206, semester: "SPRING", offset: 1 },
-      { code: "MATH", number: 152, semester: "SPRING", offset: 1 },
-      { code: "ENGL", number: 210, semester: "SPRING", offset: 1 },
-      { code: "MATH", number: 304, semester: "FALL", offset: 2 },
-      { code: "STAT", number: 211, semester: "FALL", offset: 4 },
-      { code: "MATH", number: 251, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 410, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 421, semester: "SPRING", offset: 5 },
-      { code: "CSCE", number: 412, semester: "FALL", offset: 4 },
-      { code: "CSCE", number: 431, semester: "FALL", offset: 6 },
-      { code: "CSCE", number: 420, semester: "FALL", offset: 6 },
-      { code: "CSCE", number: 430, semester: "SPRING", offset: 7 }
+      { code: "CSCE", number: 181, offset: 2 },
+      { code: "CSCE", number: 120, offset: 2 },
+      { code: "CSCE", number: 222, offset: 2 },
+      { code: "CSCE", number: 221, offset: 3 },
+      { code: "CSCE", number: 312, offset: 3 },
+      { code: "CSCE", number: 314, offset: 3 },
+      { code: "CSCE", number: 313, offset: 4 },
+      { code: "CSCE", number: 331, offset: 4 },
+      { code: "CSCE", number: 411, offset: 5 },
+      { code: "CSCE", number: 481, offset: 5 },
+      { code: "CSCE", number: 399, offset: 5 },
+      { code: "CSCE", number: 482, offset: 7 },
+      { code: "ENGR", number: 102, offset: 0 },
+      { code: "MATH", number: 151, offset: 0 },
+      { code: "CHEM", number: 107, offset: 0 },
+      { code: "ENGL", number: 104, offset: 0 },
+      { code: "ENGR", number: 216, offset: 1 },
+      { code: "PHYS", number: 206, offset: 1 },
+      { code: "MATH", number: 152, offset: 1 },
+      { code: "ENGL", number: 210, offset: 1 },
+      { code: "MATH", number: 304, offset: 2 },
+      { code: "STAT", number: 211, offset: 4 },
+      { code: "MATH", number: 251, offset: 5 },
+      { code: "CSCE", number: 410, offset: 5 },
+      { code: "CSCE", number: 421, offset: 5 },
+      { code: "CSCE", number: 412, offset: 4 },
+      { code: "CSCE", number: 431, offset: 6 },
+      { code: "CSCE", number: 420, offset: 6 },
+      { code: "CSCE", number: 430, offset: 7 }
     ]
 
     # Define emphasis-specific courses
     emphasis_courses = {
       "Mathematics" => [
-        { code: "MATH", number: 308, semester: "SPRING", offset: 3 },
-        { code: "MATH", number: 439, semester: "FALL", offset: 4 },
-        { code: "MATH", number: 467, semester: "FALL", offset: 6 },
-        { code: "MATH", number: 425, semester: "SPRING", offset: 7 }
+        { code: "MATH", number: 308, offset: 3 },
+        { code: "MATH", number: 439, offset: 4 },
+        { code: "MATH", number: 467, offset: 6 },
+        { code: "MATH", number: 425, offset: 7 }
       ],
       "Business" => [
-        { code: "ACCT", number: 209, semester: "SPRING", offset: 3 },
-        { code: "FINC", number: 409, semester: "FALL", offset: 4 },
-        { code: "ISTM", number: 209, semester: "FALL", offset: 6 },
-        { code: "MGMT", number: 209, semester: "SPRING", offset: 7 }
+        { code: "ACCT", number: 209, offset: 3 },
+        { code: "FINC", number: 409, offset: 4 },
+        { code: "ISTM", number: 209, offset: 6 },
+        { code: "MGMT", number: 209, offset: 7 }
       ],
       "Art" => [
-        { code: "ARTS", number: 104, semester: "SPRING", offset: 1 },
-        { code: "ARTS", number: 303, semester: "FALL", offset: 2 },
-        { code: "ARTS", number: 356, semester: "SPRING", offset: 3 },
-        { code: "ARTS", number: 403, semester: "FALL", offset: 4 },
-        { code: "ARTS", number: 485, semester: "FALL", offset: 6 },
-        { code: "ARTS", number: 489, semester: "SPRING", offset: 7 }
+        { code: "ARTS", number: 104, offset: 1 },
+        { code: "ARTS", number: 303, offset: 2 },
+        { code: "ARTS", number: 356, offset: 3 },
+        { code: "ARTS", number: 403, offset: 4 },
+        { code: "ARTS", number: 485, offset: 6 },
+        { code: "ARTS", number: 489, offset: 7 }
       ],
       "Cyber Security" => [
-        { code: "CYBR", number: 402, semester: "SPRING", offset: 3 },
-        { code: "CYBR", number: 403, semester: "FALL", offset: 4 },
-        { code: "CYBR", number: 405, semester: "FALL", offset: 6 },
-        { code: "CYBR", number: 491, semester: "SPRING", offset: 7 }
+        { code: "CYBR", number: 402, offset: 3 },
+        { code: "CYBR", number: 403, offset: 4 },
+        { code: "CYBR", number: 405, offset: 6 },
+        { code: "CYBR", number: 491, offset: 7 }
       ]
     }
 
-    # Assign common courses
     assign_courses(common_courses)
-
-    # Assign emphasis-specific courses
-    if emphasis.present? && emphasis_courses.key?(emphasis.ename)
-      assign_courses(emphasis_courses[emphasis.ename])
-    end
+    assign_courses(emphasis_courses[emphasis.ename]) if emphasis.present? && emphasis_courses.key?(emphasis.ename)
   end
 
   def assign_courses(course_list)
     course_list.each do |course_data|
       course = Course.find_by(ccode: course_data[:code], cnumber: course_data[:number])
       semester = calculate_semester(enrol_year, enrol_semester, course_data[:offset])
-
       RecCourse.create!(course_id: course.id, student: self, semester: semester) if course
     end
   end
 
   def calculate_semester(start_year, start_semester, offset)
     year = start_year
-    semester = start_semester
-
+    semester = start_semester.upcase
+    
     offset.times do
       if semester == "SPRING"
         semester = "FALL"
