@@ -14,7 +14,8 @@
     <h1 class="degreeplan-title">Your Degree Planner</h1>
       <% if flash[:success] %>
         <div class="alert alert-success"><%= flash[:success] %></div>
-      <% elsif flash[:error] %>
+      <% end %>
+      <% if flash[:error] %>
         <div class="alert alert-danger"><%= flash[:error] %></div>
       <% end %>
 
