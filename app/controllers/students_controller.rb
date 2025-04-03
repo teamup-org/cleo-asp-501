@@ -180,6 +180,8 @@ class StudentsController < ApplicationController
               flash[:alert] = "No valid courses were found in the transcript."
               @parse_error = "No courses could be grouped by semester"
             else
+              # Log the parsed data for debugging
+              Rails.logger.info("Parsed data: #{@parsed_data.inspect}")
               flash[:notice] = "Transcript parsed successfully! Found #{@parsed_data.size} courses. Please review and confirm the courses."
             end
           end
@@ -254,6 +256,40 @@ class StudentsController < ApplicationController
                             3
                           end
 
+            # Clean and validate grade
+            grade = course_data['grade']
+            if grade
+              grade = grade.strip.upcase
+              # Map special grade codes
+              grade_mapping = {
+                'TCR' => 'TR',    # Transfer Credit
+                'CR' => 'CR',     # Credit
+                'P' => 'P',       # Pass
+                'NP' => 'NP',     # No Pass
+                'W' => 'W',       # Withdrawal
+                'I' => 'I',       # Incomplete
+                'IP' => 'IP',     # In Progress
+                'S' => 'S',       # Satisfactory
+                'U' => 'U',       # Unsatisfactory
+                'AUD' => 'AU',    # Audit
+                'INC' => 'I',     # Incomplete
+                'NR' => 'NR',     # Not Reported
+                'NG' => 'NG',     # No Grade
+                'Q' => 'Q',       # Questionable
+                'X' => 'X',       # No Grade
+                'Y' => 'Y',       # No Grade
+                'Z' => 'Z'        # No Grade
+              }
+              grade = grade_mapping[grade] || grade
+              
+              # Normalize letter grades
+              if grade.match?(/^[A-D][+-]?$/)
+                grade = grade.upcase
+              elsif grade.match?(/^F[+-]?$/)
+                grade = 'F'  # Convert F+ and F- to F
+              end
+            end
+
             # Create or find the course
             db_course = Course.find_or_initialize_by(
               ccode: course_data['ccode'].upcase,
@@ -271,16 +307,17 @@ class StudentsController < ApplicationController
               end
             end
             
-            # Create the student course record
+            # Create the student course record with grade
             prev_course = PrevStudentCourse.new(
               uin: current_student_login.uid,
               course_id: db_course.id,
-              semester: course_data['semester']
+              semester: course_data['semester'],
+              grade: grade  # Save the processed grade
             )
             
             if prev_course.save
               saved_count += 1
-              Rails.logger.info("Saved course #{db_course.ccode} #{db_course.cnumber} for semester #{course_data['semester']}")
+              Rails.logger.info("Saved course #{db_course.ccode} #{db_course.cnumber} for semester #{course_data['semester']} with grade #{grade}")
             else
               error_msg = prev_course.errors.full_messages.join(', ')
               Rails.logger.error("Failed to save student course: #{error_msg}")
@@ -335,7 +372,8 @@ class StudentsController < ApplicationController
           'ccode' => psc.course.ccode,
           'cnumber' => psc.course.cnumber,
           'cname' => psc.course.cname,
-          'credit_hours' => psc.course.credit_hours
+          'credit_hours' => psc.course.credit_hours,
+          'grade' => psc.grade  # Add the grade to the mapped data
         }
       end
     end
