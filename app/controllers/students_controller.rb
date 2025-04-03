@@ -133,8 +133,34 @@ class StudentsController < ApplicationController
 
         # Parse the transcript using Python
         Rails.logger.info("Parsing transcript: #{temp_file.path}")
-        output = `python3 #{Rails.root.join('python', 'parse.py')} #{temp_file.path} 2> #{Rails.root.join('log', 'transcript_parser.log')}`
+        python_script_path = Rails.root.join('python', 'parse.py')
+        requirements_path = Rails.root.join('python', 'requirements.txt')
+        
+        # Check if Python script exists
+        unless File.exist?(python_script_path)
+          flash[:alert] = "Transcript parser script not found. Please contact support."
+          Rails.logger.error("Python script not found at: #{python_script_path}")
+          return render :show_parsed_transcript
+        end
+        
+        # Install dependencies if requirements.txt exists
+        if File.exist?(requirements_path)
+          Rails.logger.info("Installing Python dependencies...")
+          `pip3 install -r #{requirements_path} 2>&1`
+        end
+        
+        # Run the Python script with error redirection
+        output = `python3 #{python_script_path} #{temp_file.path} 2> #{Rails.root.join('log', 'transcript_parser.log')}`
         Rails.logger.info("Python script output: #{output}")
+        
+        # Check if Python command failed
+        if $?.exitstatus != 0
+          log_content = File.read(Rails.root.join('log', 'transcript_parser.log'))
+          flash[:alert] = "Failed to parse transcript. Please ensure Python 3 and required dependencies are installed."
+          @parse_error = "Python script failed. Check logs for details. Error: #{log_content}"
+          Rails.logger.error("Python script failed. Log: #{log_content}")
+          return render :show_parsed_transcript
+        end
         
         begin
           # Parse the JSON data
