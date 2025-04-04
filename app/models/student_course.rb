@@ -22,11 +22,13 @@ class StudentCourse < ApplicationRecord
   def add_to_rec_courses
     semester_str = convert_semester(student, sem) # Convert integer to "SPRING2025"
     
-    RecCourse.create!(
-      course_id: course_id,
-      uin: student.google_id, # Assuming google_id is the correct unique identifier for RecCourse
-      semester: semester_str
-    )
+    unless RecCourse.exists?(course_id: course_id, uin: student.google_id)
+      RecCourse.create!(
+        course_id: course_id,
+        uin: student.google_id, # Assuming google_id is the correct unique identifier for RecCourse
+        semester: semester_str
+      )
+    end
   end
 
   def convert_semester(student, sem_int)
