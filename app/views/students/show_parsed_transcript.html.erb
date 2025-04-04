@@ -6,6 +6,12 @@
         <% next if message.blank? %>
         <div class="alert alert-<%= type == 'alert' ? 'danger' : (type == 'notice' ? 'info' : 'success') %> alert-dismissible fade show" role="alert">
           <%= message %>
+          <% if type == 'alert' && flash[:error_details].present? %>
+            <div class="mt-2 small">
+              <strong>Error details:</strong>
+              <div class="mt-1"><%= flash[:error_details].html_safe %></div>
+            </div>
+          <% end %>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <% end %>
@@ -58,6 +64,13 @@
               <label for="credit_hours" class="form-label">Credit Hours</label>
               <input type="number" class="form-control" id="credit_hours" name="credit_hours" min="0" max="12" step="1" value="3">
             </div>
+            
+            <div class="mb-3">
+              <label for="grade" class="form-label">Grade</label>
+              <input type="text" class="form-control" id="grade" name="grade" 
+                     pattern="[A-Z][+-]?|TR|CR|P|NP|W|I|IP|S|U"
+                     placeholder="A, B+, C, etc.">
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -90,8 +103,9 @@
                         <% end %>
                         <th style="width: 15%">Course Code</th>
                         <th style="width: 15%">Course Number</th>
-                        <th style="width: <%= params[:action] == 'view_transcript_courses' ? '50%' : '45%' %>">Course Name</th>
-                        <th style="width: 15%">Hours</th>
+                        <th style="width: <%= params[:action] == 'view_transcript_courses' ? '40%' : '35%' %>">Course Name</th>
+                        <th style="width: 10%">Hours</th>
+                        <th style="width: 10%">Grade</th>
                         <% if params[:action] == 'view_transcript_courses' %>
                           <th style="width: 20%">Actions</th>
                         <% end %>
@@ -156,6 +170,17 @@
                               <%= course['credit_hours'] %>
                             <% end %>
                           </td>
+                          <td>
+                            <% if params[:action] != 'view_transcript_courses' %>
+                              <input type="text" class="form-control form-control-sm course-grade-input"
+                                value="<%= course['grade'] %>"
+                                data-index="<%= index %>"
+                                data-original="<%= course['grade'] %>"
+                                pattern="[A-Z][+-]?|TR|CR|P|NP|W|I|IP|S|U">
+                            <% else %>
+                              <%= course['grade'] %>
+                            <% end %>
+                          </td>
                           <% if params[:action] == 'view_transcript_courses' %>
                             <td class="text-end">
                               <div class="btn-group btn-group-sm">
@@ -164,7 +189,8 @@
                                   data-ccode="<%= course['ccode'] %>"
                                   data-cnumber="<%= course['cnumber'] %>"
                                   data-cname="<%= course['cname'] %>"
-                                  data-credit-hours="<%= course['credit_hours'] %>">
+                                  data-credit-hours="<%= course['credit_hours'] %>"
+                                  data-grade="<%= course['grade'] %>">
                                   <i class="fas fa-edit"></i>
                                 </button>
                                 <%= button_to remove_transcript_course_student_path(current_student_login, 
@@ -604,6 +630,7 @@
           const cnumber = this.dataset.cnumber;
           const cname = this.dataset.cname;
           const creditHours = this.dataset.creditHours;
+          const grade = this.dataset.grade;
           
           document.getElementById('modalSemester').value = semester;
           document.getElementById('modalEditMode').value = 'true';
@@ -613,6 +640,7 @@
           document.getElementById('cnumber').value = cnumber;
           document.getElementById('cname').value = cname;
           document.getElementById('credit_hours').value = creditHours;
+          document.getElementById('course-grade-input').value = grade;
           
           courseModal.show();
         });
