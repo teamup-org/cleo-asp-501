@@ -55,7 +55,7 @@ class Course < ApplicationRecord
   private
 
   def set_default_credit_hours
-    self.credit_hours ||= 3
+    self.credit_hours = 3 if [nil, false, 0].include?(self.credit_hours)
   end
 end
 
