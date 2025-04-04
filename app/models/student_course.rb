@@ -15,6 +15,8 @@ class StudentCourse < ApplicationRecord
   # Automatically add to recommended courses
   before_create :add_to_rec_courses
 
+  after_destroy :remove_related_rec_course
+
   private
 
   def add_to_rec_courses
@@ -43,4 +45,9 @@ class StudentCourse < ApplicationRecord
 
     "#{semester}#{year}"
   end
+
+  def remove_related_rec_course
+    RecCourse.find_by(uin: student.google_id, course_id: course.id)&.destroy
+  end
+
 end
