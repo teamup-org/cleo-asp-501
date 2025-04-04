@@ -4,8 +4,11 @@ class Course < ApplicationRecord
   # Validations
   validates :ccode, :cnumber, presence: true
   validates :credit_hours, :lecture_hours, :lab_hours, :cnumber, numericality: { only_integer: true }
-  validates :ccode, length: { minimum: 4, maximimum: 30 }
+  validates :ccode, length: { minimum: 4, maximum: 30 }
   validates :ccode, uniqueness: { scope: :cnumber }
+
+  # Callbacks
+  before_save :set_default_credit_hours
 
   # Prerequisites associations
   has_many :prerequisites, foreign_key: :course_id
@@ -49,4 +52,10 @@ class Course < ApplicationRecord
     "#{ccode} #{cnumber}"
   end
 
+  private
+
+  def set_default_credit_hours
+    self.credit_hours ||= 3
+  end
 end
+
