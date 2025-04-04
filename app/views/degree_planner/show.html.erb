@@ -14,7 +14,8 @@
     <h1 class="degreeplan-title">Your Degree Planner</h1>
       <% if flash[:success] %>
         <div class="alert alert-success"><%= flash[:success] %></div>
-      <% elsif flash[:error] %>
+      <% end %>
+      <% if flash[:error] %>
         <div class="alert alert-danger"><%= flash[:error] %></div>
       <% end %>
 
@@ -55,11 +56,43 @@
       Each semester contains a table of courses that are already added to that semester.
     %>
     <div class="degreeplan2-grid">
-      <% (1..8).each do |sem| %>
-        <div class="semester2-container">
-          <h3>Semester <%= sem %>:</h3>
+      <% 
+        # Get enrollment information
+        enroll_semester = @student.enrol_semester.downcase
+        enroll_year = @student.enrol_year
+        
+        # Define list of semesters
+        all_semesters = []
+        
+        # Generate 8 semesters starting from enrollment
+        current_semester = enroll_semester
+        current_year = enroll_year
+        
+        8.times do |i|
+          semester_string = "#{current_semester.upcase}#{current_year}"
+          all_semesters << semester_string
+          
+          # Update for next iteration
+          if current_semester == "fall"
+            current_semester = "spring"
+            current_year += 1
+          else # spring -> fall
+            current_semester = "fall"
+          end
+        end
+      %>
 
-          <%# Table listing the courses assigned to this semester %>
+      <% all_semesters.each_with_index do |semester_string, index| %>
+        <div class="semester2-container">
+          <% 
+            # Parse the semester string to get readable format
+            season = semester_string.match(/[A-Z]+/)[0].capitalize
+            year = semester_string.match(/\d+/)[0]
+          %>
+          
+          <h3><%= "#{season} #{year}" %></h3>
+
+          <%# Table listing the recommended courses for this semester %>
           <table>
             <thead>
               <tr>
@@ -69,32 +102,24 @@
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody id="semester-<%= sem %>-courses">
-              <% @course_prerequisite_status.select { |status| status[:student_course].sem == sem }.each do |course_status| %>
-                <% student_course = course_status[:student_course] %>
-                <tr 
-                  id="course-<%= student_course.course.id %>-semester-<%= sem %>"
-                  class="<%= course_status[:prerequisites_met] ? '' : 'prerequisite-warning' %>"
-                >
+            <tbody id="semester-<%= index + 1 %>-courses">
+              <% 
+                # Get recommended courses for this semester and student
+                rec_courses = RecCourse.where(uin: @student.google_id, semester: semester_string)
+                                      .includes(:course)
+              %>
+              
+              <% rec_courses.each do |rec_course| %>
+                <tr id="course-<%= rec_course.course.id %>-semester-<%= index + 1 %>">
+                  <td><%= "#{rec_course.course.ccode} #{rec_course.course.cnumber}" %></td>
+                  <td><%= rec_course.course.cname %></td>
+                  <td><%= rec_course.course.credit_hours %></td>
                   <td>
-                    <%= "#{student_course.course.ccode} #{student_course.course.cnumber}" %>
-                    <% unless course_status[:prerequisites_met] %>
-                      <span 
-                        class="prerequisite-warning-icon" 
-                        data-course-id="<%= student_course.course.id %>"
-                        title="Missing Prerequisites"
-                      >
-                        ⚠️
-                      </span>
-                    <% end %>
-                  </td>
-                  <td><%= student_course.course.cname %></td>
-                  <td><%= student_course.course.credit_hours %></td>
-                  <td>
-                    <%= link_to 'Remove', remove_course_student_degree_planner_path(@student, course_id: student_course.course.id), 
-                      method: :delete, 
-                      data: { confirm: "Are you sure you want to remove this course?" }, 
-                      class: 'remove-course-button' 
+                    <%= link_to 'Remove', 
+                        remove_course_student_degree_planner_path(@student, course_id: rec_course.course.id), 
+                        method: :delete, 
+                        data: { confirm: "Are you sure you want to remove this course?" }, 
+                        class: 'remove-course-button' 
                     %>
                   </td>
                 </tr>
@@ -104,6 +129,7 @@
         </div>
       <% end %>
     </div>
+
 
     <%# 
       Action buttons for saving and downloading the degree plan.

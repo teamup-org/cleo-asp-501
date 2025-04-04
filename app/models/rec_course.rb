@@ -5,5 +5,6 @@ class RecCourse < ApplicationRecord
     validates :course_id, presence: true
     validates :uin, presence: true
     validates :semester, presence: true
+
   end
   

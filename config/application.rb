@@ -24,19 +24,6 @@ module CleoCourseScheduler
     puts "Initializing PyCall with Python3..."
     PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
 
-    # Ensure pdfplumber is available
-    begin
-      PyCall.builtins.eval("import pdfplumber")
-    rescue StandardError => e
-      puts "Error importing pdfplumber: #{e.message}"
-      puts "Attempting to install pdfplumber..."
-      begin
-        PyCall.builtins.eval("import pip; pip.main(['install', 'pdfplumber'])")
-      rescue StandardError => install_error
-        puts "Failed to install pdfplumber: #{install_error.message}"
-      end
-    end
-
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

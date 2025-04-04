@@ -12,7 +12,10 @@ class DegreePlannerController < ApplicationController
     @course_prerequisite_status = check_prerequisites(@student, @student_courses)
     @emphasis_options = Emphasis.all.pluck(:ename)
     @track_options = Track.all.pluck(:tname)
-    
+  
+    puts("Required for major: #{@default_plan.inspect}")
+    flash_schedule_issues()
+
   end
 
   def add_course
@@ -42,15 +45,22 @@ class DegreePlannerController < ApplicationController
     add_student_course_records(degree_requirements)
 
     flash[:success] = 'Degree planner has been filled with courses from your major!'
+    
     redirect_to student_degree_planner_path(@student)
   end
 
   def update_plan
+
+    puts("Updating plan with params: #{params.inspect}")
+
     selected_course_id = params[:add_course].to_i
     semester = params[:sem].to_i
 
     if selected_course_id.positive? && semester.between?(1, 8)
+      puts("ran here")
       student_course = StudentCourse.new(student_id: @student.id, course_id: selected_course_id, sem: semester)
+
+
 
       if student_course.save
         flash[:success] = 'Course added successfully!'
@@ -67,11 +77,12 @@ class DegreePlannerController < ApplicationController
   end
 
   def remove_course
-    student_course = StudentCourse.find_by(student_id: @student.id, course_id: params[:course_id])
+    rec_course = RecCourse.find_by(student_id: @student.id, course_id: params[:course_id])
 
-    if student_course
-      student_course.destroy
+    if rec_course
+      rec_course.destroy
       flash[:success] = 'Course removed successfully!'
+
     else
       flash[:error] = 'Course not found in your planner.'
     end
@@ -99,6 +110,7 @@ class DegreePlannerController < ApplicationController
       )
     end
 
+    flash_schedule_issues()
     flash[:success] = 'Degree plan generated successfully!'
     redirect_to student_degree_planner_path(@student)
   end
@@ -240,4 +252,16 @@ class DegreePlannerController < ApplicationController
     end
   end
   # ========================================================================
+
+  def flash_schedule_issues()
+
+    # Check if I am missing a required class
+    missing_prereqs = @course_prerequisite_status.select { |status| !status[:prerequisites_met] }
+    if missing_prereqs.any?
+      flash[:error] = "You are missing prerequisites for the following courses: " +
+                      missing_prereqs.map { |status| status[:student_course].course.cname }.join(', ')
+    end
+
+
+  end
 end
