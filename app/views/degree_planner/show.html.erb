@@ -118,7 +118,7 @@
                     <%= link_to 'Remove', 
                         remove_course_student_degree_planner_path(@student, course_id: rec_course.course.id), 
                         method: :delete, 
-                        data: { confirm: "Are you sure you want to remove this course?" }, 
+                        data: { confirm: "Are you sure you want to remove this course?", student_id: @student.id, course_id: rec_course.course.id}, 
                         class: 'remove-course-button' 
                     %>
                   </td>
