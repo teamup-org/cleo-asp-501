@@ -255,7 +255,9 @@ class DegreePlannerController < ApplicationController
   # ========================================================================
 
   def flash_schedule_issues()
-
+    if @course_prerequisite_status == nil
+      return
+    end
     # Check if I am missing a required class
     missing_prereqs = @course_prerequisite_status.select { |status| !status[:prerequisites_met] }
     if missing_prereqs.any?
