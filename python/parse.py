@@ -65,7 +65,7 @@ def parse_courses_from_text(text: str) -> List[Dict[str, Any]]:
             \s+
             (\d+(?:\.\d+)?)\s*     # Credit hours
             (?:                     # Optional grade info
-                ([A-Z][+-]?|TCR)   # Grade or TCR
+                ([A-Z][+-]?|TCR|CR|P|NP|W|I|IP|S|U|AUD|INC|NR|NG|Q|X|Y|Z)   # Grade or special codes
                 (?:\s+\d+\.\d+)?   # Optional grade points
             )?
         )?
@@ -145,13 +145,49 @@ def parse_courses_from_text(text: str) -> List[Dict[str, Any]]:
                     semester = "Unknown Semester"
                     logger.warning(f"Course found without semester context: {line}")
 
+                # Clean up and validate grade
+                if grade:
+                    grade = grade.strip()
+                    # Map special grade codes to standard format
+                    grade_mapping = {
+                        'TCR': 'TR',    # Transfer Credit
+                        'CR': 'CR',     # Credit
+                        'P': 'P',       # Pass
+                        'NP': 'NP',     # No Pass
+                        'W': 'W',       # Withdrawal
+                        'I': 'I',       # Incomplete
+                        'IP': 'IP',     # In Progress
+                        'S': 'S',       # Satisfactory
+                        'U': 'U',       # Unsatisfactory
+                        'AUD': 'AU',    # Audit
+                        'INC': 'I',     # Incomplete
+                        'NR': 'NR',     # Not Reported
+                        'NG': 'NG',     # No Grade
+                        'Q': 'Q',       # Questionable
+                        'X': 'X',       # No Grade
+                        'Y': 'Y',       # No Grade
+                        'Z': 'Z'        # No Grade
+                    }
+                    grade = grade_mapping.get(grade, grade)
+                    
+                    # Normalize letter grades
+                    if grade in ['A', 'B', 'C', 'D', 'F']:
+                        grade = grade.upper()
+                    elif grade in ['A+', 'A-', 'B+', 'B-', 'C+', 'C-', 'D+', 'D-']:
+                        grade = grade.upper()
+                    elif grade in ['F+', 'F-']:
+                        grade = 'F'  # Convert F+ and F- to F
+                    
+                    # Log the grade for debugging
+                    logger.info(f"Processed grade for {subj} {number}: {grade}")
+
                 course_data = {
                     'semester': semester,
                     'ccode': subj,
                     'cnumber': number,
                     'cname': title,
                     'credit_hours': credit_hours,
-                    'grade': grade if grade and grade != 'TCR' else None
+                    'grade': grade if grade else None
                 }
                 
                 logger.info(f"Found course: {course_data}")
