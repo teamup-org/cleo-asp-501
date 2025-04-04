@@ -311,7 +311,7 @@ class StudentsController < ApplicationController
             prev_course = PrevStudentCourse.new(
               uin: current_student_login.uid,
               course_id: db_course.id,
-              semester: course_data['semester'],
+              semester: course_data['semester'].upcase.delete(' '),
               grade: grade  # Save the processed grade
             )
             

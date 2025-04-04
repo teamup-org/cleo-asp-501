@@ -30,6 +30,7 @@ class Student < ApplicationRecord
 
   has_many :student_courses, dependent: :destroy
   has_many :courses, through: :student_courses
+  has_many :prev_student_courses, primary_key: "google_id", foreign_key: :uin, dependent: :destroy
   has_many :rec_courses, primary_key: "google_id", foreign_key: :uin, dependent: :destroy
   #has_one :student_info, primary_key: "google_id", foreign_key: :uin
 
