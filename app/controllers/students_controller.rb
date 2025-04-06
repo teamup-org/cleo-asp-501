@@ -284,6 +284,7 @@ class StudentsController < ApplicationController
               course_id: db_course.id,
               semester: course.semester.upcase.delete(' '),
               grade: course.grade
+
             )
             
             if prev_course.save

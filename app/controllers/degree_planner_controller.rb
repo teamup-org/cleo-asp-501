@@ -77,7 +77,7 @@ class DegreePlannerController < ApplicationController
   end
 
   def remove_course
-    rec_course = RecCourse.find_by(student_id: @student.id, course_id: params[:course_id])
+    rec_course = RecCourse.find_by(uin: @student.id, course_id: params[:course_id])
 
     if rec_course
       rec_course.destroy
@@ -174,6 +174,7 @@ class DegreePlannerController < ApplicationController
 
   def destroy_student_courses
     @student.student_courses.destroy_all
+    @student.rec_courses.destroy_all
   end
 
   def check_prerequisites(student, courses)
@@ -254,7 +255,9 @@ class DegreePlannerController < ApplicationController
   # ========================================================================
 
   def flash_schedule_issues()
-
+    if @course_prerequisite_status == nil
+      return
+    end
     # Check if I am missing a required class
     missing_prereqs = @course_prerequisite_status.select { |status| !status[:prerequisites_met] }
     if missing_prereqs.any?

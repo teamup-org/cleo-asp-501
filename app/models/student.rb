@@ -30,6 +30,7 @@ class Student < ApplicationRecord
 
   has_many :student_courses, dependent: :destroy
   has_many :courses, through: :student_courses
+  has_many :prev_student_courses, primary_key: "google_id", foreign_key: :uin, dependent: :destroy
   has_many :rec_courses, primary_key: "google_id", foreign_key: :uin, dependent: :destroy
   #has_one :student_info, primary_key: "google_id", foreign_key: :uin
 
@@ -61,24 +62,24 @@ class Student < ApplicationRecord
       { code: "CSCE", number: 411, offset: 5 },
       { code: "CSCE", number: 481, offset: 5 },
       { code: "CSCE", number: 399, offset: 5 },
-      { code: "CSCE", number: 482, offset: 7 },
-      { code: "ENGR", number: 102, offset: 0 },
-      { code: "MATH", number: 151, offset: 0 },
-      { code: "CHEM", number: 107, offset: 0 },
-      { code: "ENGL", number: 104, offset: 0 },
-      { code: "ENGR", number: 216, offset: 1 },
-      { code: "PHYS", number: 206, offset: 1 },
-      { code: "MATH", number: 152, offset: 1 },
-      { code: "ENGL", number: 210, offset: 1 },
-      { code: "MATH", number: 304, offset: 2 },
-      { code: "STAT", number: 211, offset: 4 },
-      { code: "MATH", number: 251, offset: 5 },
-      { code: "CSCE", number: 410, offset: 5 },
-      { code: "CSCE", number: 421, offset: 5 },
-      { code: "CSCE", number: 412, offset: 4 },
-      { code: "CSCE", number: 431, offset: 6 },
-      { code: "CSCE", number: 420, offset: 6 },
-      { code: "CSCE", number: 430, offset: 7 }
+      { code: "CSCE", number: 482, offset: 7 }
+      #{ code: "ENGR", number: 102, offset: 0 },
+      #{ code: "MATH", number: 151, offset: 0 },
+      #{ code: "CHEM", number: 107, offset: 0 },
+      #{ code: "ENGL", number: 104, offset: 0 },
+      #{ code: "ENGR", number: 216, offset: 1 },
+      #{ code: "PHYS", number: 206, offset: 1 },
+      #{ code: "MATH", number: 152, offset: 1 },
+      #{ code: "ENGL", number: 210, offset: 1 },
+      #{ code: "MATH", number: 304, offset: 2 },
+      #{ code: "STAT", number: 211, offset: 4 },
+      #{ code: "MATH", number: 251, offset: 5 },
+      #{ code: "CSCE", number: 410, offset: 5 },
+      #{ code: "CSCE", number: 421, offset: 5 },
+      #{ code: "CSCE", number: 412, offset: 4 },
+      #{ code: "CSCE", number: 431, offset: 6 },
+      #{ code: "CSCE", number: 420, offset: 6 },
+      #{ code: "CSCE", number: 430, offset: 7 }
     ]
 
     # Define emphasis-specific courses
@@ -112,7 +113,7 @@ class Student < ApplicationRecord
     }
 
     assign_courses(common_courses)
-    assign_courses(emphasis_courses[emphasis.ename]) if emphasis.present? && emphasis_courses.key?(emphasis.ename)
+    #assign_courses(emphasis_courses[emphasis.ename]) if emphasis.present? && emphasis_courses.key?(emphasis.ename)
   end
 
   def assign_courses(course_list)
