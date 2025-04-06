@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_07_163019) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_28_163324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -215,15 +215,21 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_07_163019) do
     t.index ["track_id"], name: "index_students_on_track_id"
   end
 
-  create_table "tracks", force: :cascade do |t|
-    t.string "tname", limit: 255, null: false
+  create_table "temporary_transcript_courses", force: :cascade do |t|
+    t.string "session_id", null: false
+    t.string "semester"
+    t.string "ccode"
+    t.string "cnumber"
+    t.string "cname"
+    t.float "credit_hours"
+    t.string "grade"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["session_id"], name: "index_temporary_transcript_courses_on_session_id"
   end
 
-  create_table "user_transcripts", force: :cascade do |t|
-    t.string "uin"
-    t.binary "transcript"
+  create_table "tracks", force: :cascade do |t|
+    t.string "tname", limit: 255, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -249,5 +255,4 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_07_163019) do
   add_foreign_key "sections", "courses"
   add_foreign_key "student_courses", "students", primary_key: "google_id"
   add_foreign_key "student_infos", "students", column: "uin", primary_key: "google_id"
-  add_foreign_key "user_transcripts", "students", column: "uin", primary_key: "google_id"
 end

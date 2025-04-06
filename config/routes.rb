@@ -88,10 +88,10 @@ Rails.application.routes.draw do
       
       get 'upload_transcript'
       post 'upload_transcript'
-      post 'save_transcript_courses', to: 'students#save_transcript_courses'
-      get 'view_transcript_courses', to: 'students#view_transcript_courses'
-      delete 'remove_transcript_course', to: 'students#remove_transcript_course'
-      post 'add_transcript_course', to: 'students#add_transcript_course'
+      post 'save_transcript_courses'
+      get 'view_transcript_courses'
+      delete 'remove_transcript_course'
+      post 'add_transcript_course'
     end
 
     resource :degree_planner, only: [:show], controller: 'degree_planner' do

@@ -32,17 +32,10 @@
       <h4 class="text-dark font-weight-bolder mb-3">Transcript Management</h4>
       
       <div class="d-flex gap-3 mb-4">
-        <!-- View/Edit Transcript Button -->
+        <!-- Upload/View/Edit Transcript Button -->
         <%= link_to view_transcript_courses_student_path(current_student_login), 
             class: "btn btn-primary d-flex align-items-center" do %>
-          <i class="fas fa-edit me-2"></i> View/Edit Transcript
-        <% end %>
-        
-        <!-- Upload New Transcript -->
-        <%= form_with url: upload_transcript_student_path(@student), local: true, 
-            html: { multipart: true, class: 'd-flex gap-2 align-items-center flex-grow-1' } do |form| %>
-          <%= form.file_field :transcript, class: "form-control", accept: "application/pdf" %>
-          <%= form.submit "Upload New Transcript", class: "btn btn-success" %>
+          <i class="fas fa-edit me-2"></i> Upload/View/Edit Transcript
         <% end %>
       </div>
     </div>

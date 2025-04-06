@@ -1,14 +1,14 @@
-// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
+// Entry point for the build script in your package.json
+import "@hotwired/turbo-rails"
+import "./controllers"
 
 // Import and start Rails UJS
-import Rails from "@rails/ujs";
-Rails.start();
+import Rails from "@rails/ujs"
+Rails.start()
 
-import "@hotwired/turbo-rails"
-import "controllers"
+// Import Bootstrap
 import "bootstrap"
 
-//= require jquery
-//= require jquery_ujs
+// Import all JavaScript files in the directory
 //= require_tree .
 
