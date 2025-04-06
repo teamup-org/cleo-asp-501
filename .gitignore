@@ -75,3 +75,6 @@ yarn.lock
 #For Macbook Development
 .DS_Store
 
+# Ignore all __pycache__ directories recursively
+**/__pycache__/
+
