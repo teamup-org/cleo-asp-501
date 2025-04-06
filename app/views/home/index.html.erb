@@ -14,9 +14,6 @@
     <h2 class="logout-message">You're Logged out! Log in to the Dashboard!</h2>
     <h3 >Get Started with your Degree Planner</h3>
 
-    <h4>Python Integration with Rails</h4>
-    <p>Python says: <%= @greeting %></p>
-
     <!-- Google Login Button -->
     <%= button_to student_login_google_oauth2_omniauth_authorize_path, class: "btn btn-danger google-btn", method: :post, data: { turbo: "false" } do %>
       <i class="fab fa-google mobile-text"></i><span class="mobile-font">&nbsp;Login with Google</span>
