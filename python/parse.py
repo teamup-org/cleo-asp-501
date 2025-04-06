@@ -113,6 +113,12 @@ def extract_course(line: str, semester: str) -> Optional[Dict[str, str]]:
         course_match = re.match(r"^([A-Z]{2,4})\s+(\d{3}[A-Z]?)\s+(.*?)\s+(\d\.\d{3})\s+([A-Z][+-]?|S|U|P|NP|CR|TCR)$", line)
         if course_match:
             subject, number, title, credits, grade = course_match.groups()
+            # Ensure course code is at least 4 characters
+            subject = subject.ljust(4, 'X')
+            # Extract only numeric part of course number and ensure it's not empty
+            number = re.sub(r'[^0-9]', '', number)
+            if not number:  # If no numbers found, use a default
+                number = "000"
             return {
                 "semester": semester,
                 "ccode": subject,
@@ -130,6 +136,13 @@ def extract_course(line: str, semester: str) -> Optional[Dict[str, str]]:
         # Extract course code and number
         subject = parts[0]
         number = parts[1]
+        
+        # Ensure course code is at least 4 characters
+        subject = subject.ljust(4, 'X')
+        # Extract only numeric part of course number and ensure it's not empty
+        number = re.sub(r'[^0-9]', '', number)
+        if not number:  # If no numbers found, use a default
+            number = "000"
         
         # Find the last credit hours and grade
         credit_match = re.search(r"(\d\.\d{3})", line)
