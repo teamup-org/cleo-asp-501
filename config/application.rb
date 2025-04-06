@@ -17,11 +17,6 @@ module CleoCourseScheduler
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
 
-    # Ensure PyCall uses the correct Python version
-    # python_path = `which python3`.strip
-    # python_path = '/usr/bin/python3' if python_path.empty?
-
-    puts "Initializing PyCall with Python3..."
     PyCall.init('/usr/bin/python3') # Change this if needed (`which python3` in terminal)
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
