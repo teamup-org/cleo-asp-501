@@ -268,13 +268,13 @@ class StudentsController < ApplicationController
             # Create or find the course
             db_course = Course.find_or_initialize_by(
               ccode: course.ccode.upcase,
-              cnumber: course.cnumber
+              cnumber: course.cnumber.to_s.gsub(/[^0-9]/, '')  # Ensure cnumber is numeric
             )
 
             # Set default values if the course is new
             if db_course.new_record?
               db_course.cname = course.cname || "#{course.ccode} #{course.cnumber}"
-              db_course.credit_hours = course.credit_hours
+              db_course.credit_hours = course.credit_hours.to_f  # Ensure credit_hours is a float
               db_course.save!
             end
             
@@ -282,7 +282,7 @@ class StudentsController < ApplicationController
             prev_course = PrevStudentCourse.new(
               uin: current_student_login.uid,
               course_id: db_course.id,
-              semester: course.semester,
+              semester: course.semester.upcase.delete(' '),
               grade: course.grade
             )
             
