@@ -112,21 +112,21 @@
             </thead>
             <tbody id="semester-<%= index + 1 %>-courses">
               <% 
-                # Get recommended courses for this semester and student
-                rec_courses = RecCourse.where(uin: @student.google_id, semester: semester_string)
+                # Get student courses for this semester
+                student_courses = StudentCourse.where(student_id: @student.id, sem: index + 1)
                                       .includes(:course)
               %>
               
-              <% rec_courses.each do |rec_course| %>
-                <tr id="course-<%= rec_course.course.id %>-semester-<%= index + 1 %>">
-                  <td><%= "#{rec_course.course.ccode} #{rec_course.course.cnumber}" %></td>
-                  <td><%= rec_course.course.cname %></td>
-                  <td><%= rec_course.course.credit_hours %></td>
+              <% student_courses.each do |student_course| %>
+                <tr id="course-<%= student_course.course.id %>-semester-<%= index + 1 %>">
+                  <td><%= "#{student_course.course.ccode} #{student_course.course.cnumber}" %></td>
+                  <td><%= student_course.course.cname %></td>
+                  <td><%= student_course.course.credit_hours %></td>
                   <td>
                     <%= link_to 'Remove', 
-                        remove_course_student_degree_planner_path(@student, course_id: rec_course.course.id), 
+                        remove_course_student_degree_planner_path(@student, course_id: student_course.course.id), 
                         method: :delete, 
-                        data: { confirm: "Are you sure you want to remove this course?", student_id: @student.id, course_id: rec_course.course.id}, 
+                        data: { confirm: "Are you sure you want to remove this course?", student_id: @student.id, course_id: student_course.course.id}, 
                         class: 'remove-course-button' 
                     %>
                   </td>
