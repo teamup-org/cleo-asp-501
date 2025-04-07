@@ -25,6 +25,29 @@ class DegreePlannerService
     @courses
   end
 
+  def generate_recommended_semester(semester, max_credits = 15)
+
+    # Get all the generated courses
+    search_courses
+
+    # Get all the courses I have already completed
+    completed_courses = @student.student_courses.where("sem < ?", semester).includes(:course)
+    completed_course_ids = completed_courses.map { |sc| sc.course_id }
+
+    # @courses - completed_courses
+    remaining_courses = @courses.reject { |course_info| completed_course_ids.include?(course_info[:course_id]) }
+    
+    # Already sorted better...
+    # sorted_courses = remaining_courses.sort_by { |c| c[:sem] || 0 }
+    semester_recommended_courses = remaining_courses.take(6)
+
+    # for every single course in semester_recommended_courses set its semester to the target semester
+    semester_recommended_courses.each { |rec| rec[:sem] = semester }
+
+
+    return semester_recommended_courses
+  end
+
   private
 
   def group_requirements_by_type(degree_requirements)

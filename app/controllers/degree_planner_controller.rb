@@ -96,7 +96,14 @@ class DegreePlannerController < ApplicationController
   # In DegreePlannerController
   def generate_custom_plan
     planner_service = DegreePlannerService.new(@student, params[:interests][:emphasis_area], params[:interests][:track_area])
+    # planned_courses = planner_service.generate_recommended_semester(8)
     planned_courses = planner_service.generate_plan
+    "Mathematics"
+    "Algorithms and Theory"
+    # puts "Emphasis Area: #{params[:interests][:emphasis_area]}"
+    # puts "Track Area: #{params[:interests][:track_area]}"
+
+    # sleep(30)
 
     # Clear existing courses
     destroy_student_courses
@@ -108,6 +115,27 @@ class DegreePlannerController < ApplicationController
         course_id: course_info[:course_id],
         sem: course_info[:sem]
       )
+    end
+
+    flash_schedule_issues()
+    flash[:success] = 'Degree plan generated successfully!'
+    redirect_to student_degree_planner_path(@student)
+  end
+
+  def recommended_semester
+    semester_index = params[:semester].to_i + 1
+    
+    planner_service = DegreePlannerService.new(@student, "Mathematics", "Algorithms and Theory")
+    planned_courses = planner_service.generate_recommended_semester(semester_index)
+
+    planned_courses.each do |course_info|
+      unless StudentCourse.exists?(student: @student, course_id: course_info[:course_id])
+        StudentCourse.create!(
+          student: @student,
+          course_id: course_info[:course_id],
+          sem: course_info[:sem]
+        )
+      end
     end
 
     flash_schedule_issues()
@@ -253,7 +281,6 @@ class DegreePlannerController < ApplicationController
     end
   end
   # ========================================================================
-
   def flash_schedule_issues()
     if @course_prerequisite_status == nil
       return

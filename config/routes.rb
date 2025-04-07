@@ -85,6 +85,7 @@ Rails.application.routes.draw do
       get 'confirm_destroy'
       get 'degree_planner', to: 'degree_planner#show'
       post 'degree_planner', to: 'degree_planner#generate_custom_plan'
+      post 'recommended_semester', to: 'degree_planner#recommended_semester', as: 'recommended_semester'
       
       get 'upload_transcript'
       post 'upload_transcript'

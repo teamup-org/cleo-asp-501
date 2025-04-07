@@ -92,6 +92,14 @@
           
           <h3><%= "#{season} #{year}" %></h3>
 
+          <%# <%= button_to "Generate Based on Interests", recommended_semester_student_path(@student, semester: index), method: :post, class: "btn" %>
+          <%= button_to "Generate Based on Interests", 
+                recommended_semester_student_path(@student, semester: index), 
+                method: :post, 
+                class: "btn semester-generate-button", 
+                data: { semester_index: index} %>
+
+
           <%# Table listing the recommended courses for this semester %>
           <table>
             <thead>
