@@ -42,9 +42,10 @@ COPY . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Pin importmap and precompile assets
-RUN bundle exec importmap pin @hotwired/turbo-rails && \
-    SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Set up assets and precompile
+RUN bundle exec rails importmap:install && \
+    bundle exec importmap pin @hotwired/turbo-rails && \
+    SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 # Install Python and Scrapy
 RUN apt-get update && apt-get install -y python3 python3-pip && \
