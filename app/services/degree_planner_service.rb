@@ -50,6 +50,14 @@ class DegreePlannerService
     degree_requirements = DegreeRequirement.where(major_id: @student.major_id)
     grouped_requirements = group_requirements_by_type(degree_requirements)
 
+    # Initialize empty arrays for each requirement type if they don't exist
+    grouped_requirements[:compulsory] ||= []
+    grouped_requirements[:ucc_elective] ||= []
+    grouped_requirements[:emphasis_elective] ||= []
+    grouped_requirements[:cs_elective] ||= []
+    grouped_requirements[:general_elective] ||= []
+    grouped_requirements[:science_elective] ||= []
+
     # Add all compulsory degree requirements
     grouped_requirements[:compulsory].each do |record|
       @courses << { course_id: record.course_id, sem: record.sem }
@@ -63,6 +71,8 @@ class DegreePlannerService
   end
 
   def add_ucc_courses(ucc_elective)
+    return if ucc_elective.empty?
+    
     category_count = Hash.new(0)
 
     # Fulfills the minimum requirements from each core category
@@ -103,8 +113,12 @@ class DegreePlannerService
   end
 
   def add_emphasis_courses(emphasis_elective)
+    return if emphasis_elective.empty?
+
     if @emphasis_area
       emphasis_id = Emphasis.where(ename: @emphasis_area)
+      return if emphasis_id.empty?
+      
       eligible_courses = CourseEmphasis.where(emphasis_id:)
       ordered_eligible_courses = order_min_prereqs('course_emphases', 'emphasis_id', eligible_courses)
 
@@ -114,8 +128,6 @@ class DegreePlannerService
         
         if @courses.none? { |c| c[:course_id] == course.course_id }
           @courses << { course_id: course.course_id, sem: elective.sem }
-        else
-          next
         end
       end
     else # If there is no emphasis area, we insert back the placeholder modules
@@ -126,20 +138,21 @@ class DegreePlannerService
   end
 
   def add_track_courses(cs_elective)
+    return if cs_elective.empty?
+
     if @track_area
       track_id = Track.where(tname: @track_area)
+      return if track_id.empty?
+      
       eligible_courses = CourseTrack.where(track_id:)
       ordered_eligible_courses = order_min_prereqs('course_tracks', 'track_id', eligible_courses)
 
       cs_elective.each_with_index do |elective, index|
-        puts ordered_eligible_courses[index].inspect
         course = ordered_eligible_courses[index]
         break unless course
         
         if @courses.none? { |c| c[:course_id] == course.course_id }
           @courses << { course_id: course.course_id, sem: elective.sem }
-        else
-          next
         end
       end
     else # If there is no track area, we insert back the placeholder modules
@@ -150,12 +163,16 @@ class DegreePlannerService
   end
 
   def add_general_courses(general_elective)
+    return if general_elective.empty?
+    
     general_elective.each do |elective|
       @courses << { course_id: elective.course_id, sem: elective.sem }
     end
   end
 
   def add_science_courses(science_elective)
+    return if science_elective.empty?
+    
     science_elective.each do |elective|
       @courses << { course_id: elective.course_id, sem: elective.sem }
     end
