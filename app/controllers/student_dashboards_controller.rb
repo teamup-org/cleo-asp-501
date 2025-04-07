@@ -5,6 +5,8 @@ class StudentDashboardsController < ApplicationController
   skip_before_action :authenticate_student_login! if Rails.env.test?
   def show; end
 
+  def grade_distribution; end
+
   private
 
   def current_year

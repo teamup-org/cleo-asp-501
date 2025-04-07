@@ -52,3 +52,6 @@ gem 'prawn'
 
 # For course selection search function
 gem 'select2-rails'
+
+# For scraping the registrar website / Anex Scrape
+gem 'httparty'
