@@ -8,6 +8,9 @@ class Course < ApplicationRecord
   validates :ccode, length: { minimum: 4, maximimum: 30 }
   validates :ccode, uniqueness: { scope: :cnumber }
 
+  # Callbacks
+  before_save :set_default_credit_hours
+
   # Prerequisites associations
   has_many :prerequisites, foreign_key: :course_id
   has_many :prerequisites_courses, through: :prerequisites, source: :prereq
@@ -48,6 +51,12 @@ class Course < ApplicationRecord
 
   def full_title
     "#{ccode} #{cnumber}"
+  end
+
+  private
+
+  def set_default_credit_hours
+    self.credit_hours = 3 if credit_hours.to_i == 0
   end
 
 end
