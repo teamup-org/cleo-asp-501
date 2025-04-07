@@ -11,7 +11,14 @@ Rails.application.routes.draw do
   end
 
   # Student dashboard (regular users)
-  resources :student_dashboards, only: [:show], param: :google_id, path: 'student_dashboard'
+  resources :student_dashboards, only: [:show], param: :google_id, path: 'student_dashboard' do
+    get 'grade_distribution', on: :member
+  end
+
+  # API routes
+  namespace :api do
+    post 'proxy', to: 'proxy#create'
+  end
 
   # Admin dashboard
   namespace :admin do

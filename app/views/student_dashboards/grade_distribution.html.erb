@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <% content_for :title, "Grade Distribution" %>
+  <%= stylesheet_link_tag 'student_dashboard', media: 'all' %>
+  <%= csrf_meta_tags %>
+  <%= javascript_importmap_tags %>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #ffffff;
+      --secondary-bg: #f8f9fa;
+      --border-color: rgba(0,0,0,0.1);
+    }
+    
+    body {
+      min-height: 100vh;
+      padding-bottom: 2rem;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-bottom: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .chart-container {
+      background-color: var(--primary-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px var(--border-color);
+      margin-bottom: 1rem;
+      height: 80vh;
+      width: 100%;
+      min-height: 600px;
+      max-height: 1000px;
+    }
+
+    .professor-section {
+      background-color: var(--primary-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 4px var(--border-color);
+      margin-bottom: 1rem;
+    }
+
+    .professor-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .professor-item {
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      user-select: none;
+    }
+
+    .professor-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .professor-item.selected {
+      background-color: #007bff;
+      color: white;
+      border-color: #0056b3;
+    }
+
+    .color-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chart-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .chart-type-selector {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-type-button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      background: var(--secondary-bg);
+      transition: all 0.2s;
+    }
+
+    .chart-type-button:hover {
+      background: #e9ecef;
+    }
+
+    .chart-type-button.active {
+      background: #007bff;
+      color: white;
+      border-color: #0056b3;
+    }
+
+    .table-container {
+      background-color: var(--primary-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px var(--border-color);
+    }
+
+    .table-responsive {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .table thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f8f9fa;
+      z-index: 1;
+      padding: 0.75rem;
+    }
+
+    .form-section {
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+      z-index: 100;
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .professor-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .year-range-selector {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .year-range-selector button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--secondary-bg);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .year-range-selector button:hover {
+      background: #e9ecef;
+    }
+
+    .year-range-selector button.active {
+      background: #007bff;
+      color: white;
+      border-color: #0056b3;
+    }
+
+    .table-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .gpa-filter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .gpa-filter select {
+      padding: 0.375rem 0.75rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .chart-section {
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1rem;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body class="student-dashboard">
+  <%= render 'shared/navbar_student' %>
+
+  <div class="container-fluid mt-4">
+    <div class="main-content">
+      <div class="form-section">
+        <h1 class="text-center mb-4">Grade Distribution</h1>
+        
+        <form id="gradeForm" class="mb-4">
+          <div class="row">
+            <div class="col-md-4">
+              <input
+                type="text"
+                id="dept"
+                placeholder="Department (e.g. CSCE)"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="col-md-4">
+              <input
+                type="text"
+                id="course"
+                placeholder="Course (e.g. 121)"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+      </div>
+
+      <div id="loadingContainer" class="loading-container d-none">
+        <div class="loading-spinner">
+          <div class="loading-dot"></div>
+        </div>
+      </div>
+
+      <div id="results" class="d-none">
+        <div class="chart-section">
+          <div class="chart-container">
+            <h2 class="text-center mb-4" id="chartTitle">GPA Trends by Professor</h2>
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
+
+        <div class="table-section">
+          <div class="table-container">
+            <div class="table-header-row">
+              <h2 class="mb-0">Detailed Grade Distribution</h2>
+              <div class="gpa-filter">
+                <label for="gpaFilter">Filter by GPA:</label>
+                <select id="gpaFilter" class="form-select form-select-sm" style="width: 150px;">
+                  <option value="all">All GPAs</option>
+                  <option value="4">4.0 and above</option>
+                  <option value="3.5">3.5 and above</option>
+                  <option value="3">3.0 and above</option>
+                  <option value="2.5">2.5 and above</option>
+                  <option value="2">2.0 and above</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Semester</th>
+                    <th>Prof</th>
+                    <th>GPA</th>
+                    <th>Section</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
+                    <th>I</th>
+                    <th>Q</th>
+                  </tr>
+                </thead>
+                <tbody id="gradeTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Color constants
+    const GRADE_COLORS = {
+      A: '#4caf50',
+      B: '#2196f3',
+      C: '#ffc107',
+      D: '#ff9800',
+      F: '#f44336',
+      I: '#9c27b0',
+      Q: '#607d8b'
+    };
+
+    const PROFESSOR_COLORS = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF',
+      '#00FFFF', '#FF8000', '#8000FF', '#00FF80', '#FF0080',
+      '#FF4000', '#00FF40', '#4000FF', '#FFBF00', '#FF00BF',
+      '#00FFBF', '#FF8040', '#8040FF', '#40FF80', '#FF4080',
+      '#FF2000', '#00FF20', '#2000FF', '#FFDF00', '#FF00DF',
+      '#00FFDF', '#FF6020', '#6020FF', '#20FF60', '#FF2060',
+      '#FF6000', '#00FF60', '#6000FF', '#FF9F00', '#FF009F',
+      '#00FF9F', '#FFA060', '#A060FF', '#60FFA0', '#FF60A0',
+      '#FF8000', '#00FF80', '#8000FF', '#FFBF00', '#FF00BF',
+      '#00FFBF', '#FFC080', '#C080FF', '#80FFC0', '#FF80C0',
+      '#FFA000', '#00FFA0', '#A000FF', '#FFDF00', '#FF00DF',
+      '#00FFDF', '#FFE0A0', '#E0A0FF', '#A0FFE0', '#FFA0E0',
+      '#FFC000', '#00FFC0', '#C000FF', '#FFFF00', '#FF00FF',
+      '#00FFFF', '#FFFFC0', '#FFC0FF', '#C0FFFF', '#FFC0FF'
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('gradeForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const errorAlert = document.getElementById('errorAlert');
+      const results = document.getElementById('results');
+      const loadingContainer = document.getElementById('loadingContainer');
+      const chartTitle = document.getElementById('chartTitle');
+      let mainChart = null;
+      let allData = null;
+      let selectedProfessors = new Set();
+      let currentGpaFilter = 'all';
+
+      // Initialize GPA filter
+      const gpaFilter = document.getElementById('gpaFilter');
+      gpaFilter.addEventListener('change', () => {
+        currentGpaFilter = gpaFilter.value;
+        updateTable();
+      });
+
+      function processData(rawData) {
+        const professors = [...new Set(rawData.map(d => d.prof))];
+        const processedData = {
+          professors: professors.map((prof, index) => ({
+            name: prof,
+            color: PROFESSOR_COLORS[index % PROFESSOR_COLORS.length]
+          })),
+          byYear: {},
+          byProfessor: {},
+          rawData: rawData
+        };
+
+        // Process data by year and professor
+        rawData.forEach(entry => {
+          // Ensure all numeric values are properly parsed
+          const A = parseInt(entry.A, 10) || 0;
+          const B = parseInt(entry.B, 10) || 0;
+          const C = parseInt(entry.C, 10) || 0;
+          const D = parseInt(entry.D, 10) || 0;
+          const F = parseInt(entry.F, 10) || 0;
+          const I = parseInt(entry.I, 10) || 0;
+          const Q = parseInt(entry.Q, 10) || 0;
+          const totalStudents = A + B + C + D + F + I + Q;
+          const gpa = entry.gpa ? parseFloat(entry.gpa) : NaN;
+
+          // Group by year
+          if (!processedData.byYear[entry.year]) {
+            processedData.byYear[entry.year] = {
+              total: 0,
+              grades: { A: 0, B: 0, C: 0, D: 0, F: 0, I: 0, Q: 0 }
+            };
+          }
+          processedData.byYear[entry.year].grades.A += A;
+          processedData.byYear[entry.year].grades.B += B;
+          processedData.byYear[entry.year].grades.C += C;
+          processedData.byYear[entry.year].grades.D += D;
+          processedData.byYear[entry.year].grades.F += F;
+          processedData.byYear[entry.year].grades.I += I;
+          processedData.byYear[entry.year].grades.Q += Q;
+          processedData.byYear[entry.year].total += totalStudents;
+
+          // Group by professor
+          if (!processedData.byProfessor[entry.prof]) {
+            processedData.byProfessor[entry.prof] = {
+              gpaByYear: {},
+              gradesByYear: {},
+              sectionsByYear: {}
+            };
+          }
+
+          // Store section data
+          const yearSemKey = `${entry.year}-${entry.semester}`;
+          if (!processedData.byProfessor[entry.prof].sectionsByYear[yearSemKey]) {
+            processedData.byProfessor[entry.prof].sectionsByYear[yearSemKey] = [];
+          }
+          processedData.byProfessor[entry.prof].sectionsByYear[yearSemKey].push({
+            section: entry.section,
+            gpa: gpa,
+            grades: { A, B, C, D, F, I, Q },
+            totalStudents
+          });
+
+          // Calculate average GPA for professor by year
+          if (!processedData.byProfessor[entry.prof].gpaByYear[entry.year]) {
+            processedData.byProfessor[entry.prof].gpaByYear[entry.year] = {
+              totalWeightedGPA: 0,
+              totalStudents: 0
+            };
+          }
+          if (!isNaN(gpa) && totalStudents > 0) {
+            processedData.byProfessor[entry.prof].gpaByYear[entry.year].totalWeightedGPA += gpa * totalStudents;
+            processedData.byProfessor[entry.prof].gpaByYear[entry.year].totalStudents += totalStudents;
+          }
+
+          // Store grade distribution by professor and year
+          if (!processedData.byProfessor[entry.prof].gradesByYear[entry.year]) {
+            processedData.byProfessor[entry.prof].gradesByYear[entry.year] = {
+              A: 0, B: 0, C: 0, D: 0, F: 0, I: 0, Q: 0,
+              total: 0
+            };
+          }
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].A += A;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].B += B;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].C += C;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].D += D;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].F += F;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].I += I;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].Q += Q;
+          processedData.byProfessor[entry.prof].gradesByYear[entry.year].total += totalStudents;
+        });
+
+        // Calculate final averages
+        Object.entries(processedData.byProfessor).forEach(([prof, data]) => {
+          Object.entries(data.gpaByYear).forEach(([year, yearData]) => {
+            if (yearData.totalStudents > 0) {
+              data.gpaByYear[year] = yearData.totalWeightedGPA / yearData.totalStudents;
+            } else {
+              data.gpaByYear[year] = null;
+            }
+          });
+        });
+
+        return processedData;
+      }
+
+      function updateProfessorList(processedData) {
+        processedData.professors.forEach(prof => {
+          selectedProfessors.add(prof.name);
+        });
+      }
+
+      function updateTable() {
+        const gradeTableBody = document.getElementById('gradeTableBody');
+        if (!allData || !gradeTableBody) return;
+
+        const tableRows = [];
+        const rawData = allData.rawData || [];
+        const gpaThreshold = parseFloat(currentGpaFilter) || 0;
+
+        // Group data by professor, year, and semester
+        const groupedData = {};
+        rawData.forEach(row => {
+          const key = `${row.prof}-${row.year}-${row.semester}`;
+          if (!groupedData[key]) {
+            groupedData[key] = {
+              prof: row.prof,
+              year: row.year,
+              semester: row.semester,
+              sections: [],
+              totalStudents: 0,
+              totalWeightedGPA: 0,
+              grades: {
+                A: 0, B: 0, C: 0, D: 0, F: 0, I: 0, Q: 0
+              }
+            };
+          }
+          
+          // Parse grade values
+          const A = parseInt(row.A, 10) || 0;
+          const B = parseInt(row.B, 10) || 0;
+          const C = parseInt(row.C, 10) || 0;
+          const D = parseInt(row.D, 10) || 0;
+          const F = parseInt(row.F, 10) || 0;
+          const I = parseInt(row.I, 10) || 0;
+          const Q = parseInt(row.Q, 10) || 0;
+          const totalStudents = A + B + C + D + F + I + Q;
+          const gpa = parseFloat(row.gpa) || 0;
+
+          groupedData[key].sections.push({
+            section: row.section,
+            gpa: gpa,
+            grades: { A, B, C, D, F, I, Q },
+            totalStudents
+          });
+
+          groupedData[key].totalStudents += totalStudents;
+          groupedData[key].totalWeightedGPA += gpa * totalStudents;
+          groupedData[key].grades.A += A;
+          groupedData[key].grades.B += B;
+          groupedData[key].grades.C += C;
+          groupedData[key].grades.D += D;
+          groupedData[key].grades.F += F;
+          groupedData[key].grades.I += I;
+          groupedData[key].grades.Q += Q;
+        });
+
+        // Convert grouped data to array and sort
+        const sortedData = Object.values(groupedData)
+          .filter(group => selectedProfessors.has(group.prof))
+          .filter(group => {
+            if (currentGpaFilter === 'all') return true;
+            const avgGPA = group.totalStudents > 0 ? group.totalWeightedGPA / group.totalStudents : 0;
+            return avgGPA >= gpaThreshold;
+          })
+          .sort((a, b) => {
+            if (b.year !== a.year) return b.year - a.year;
+            if (b.semester !== a.semester) {
+              const semOrder = { SPRING: 1, SUMMER: 2, FALL: 3 };
+              return semOrder[a.semester] - semOrder[b.semester];
+            }
+            return a.prof.localeCompare(b.prof);
+          });
+
+        // Create table rows
+        sortedData.forEach(group => {
+          const avgGPA = group.totalStudents > 0 ? group.totalWeightedGPA / group.totalStudents : 0;
+          
+          // Format grade display with count and percentage
+          const formatGrade = (count) => {
+            const percentage = group.totalStudents > 0 ? ((count / group.totalStudents) * 100).toFixed(1) : '0.0';
+            return `${count} (${percentage}%)`;
+          };
+
+          // Create section rows
+          const sectionRows = group.sections.map(section => {
+            const sectionTotal = section.totalStudents;
+            const formatSectionGrade = (count) => {
+              const percentage = sectionTotal > 0 ? ((count / sectionTotal) * 100).toFixed(1) : '0.0';
+              return `${count} (${percentage}%)`;
+            };
+
+            return `
+              <tr class="section-row" data-group-id="${group.prof}-${group.year}-${group.semester}" style="display: none;">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>${section.gpa.toFixed(2)}</td>
+                <td>${section.section}</td>
+                <td>${formatSectionGrade(section.grades.A)}</td>
+                <td>${formatSectionGrade(section.grades.B)}</td>
+                <td>${formatSectionGrade(section.grades.C)}</td>
+                <td>${formatSectionGrade(section.grades.D)}</td>
+                <td>${formatSectionGrade(section.grades.F)}</td>
+                <td>${formatSectionGrade(section.grades.I)}</td>
+                <td>${formatSectionGrade(section.grades.Q)}</td>
+              </tr>
+            `;
+          }).join('');
+
+          // Create main row with dropdown button
+          tableRows.push(`
+            <tr class="main-row" data-group-id="${group.prof}-${group.year}-${group.semester}">
+              <td>${group.year}</td>
+              <td>${group.semester}</td>
+              <td>${group.prof}</td>
+              <td>${avgGPA.toFixed(2)}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary section-toggle" 
+                        onclick="toggleSections('${group.prof}-${group.year}-${group.semester}')">
+                  ${group.sections.length} Section${group.sections.length > 1 ? 's' : ''}
+                </button>
+              </td>
+              <td>${formatGrade(group.grades.A)}</td>
+              <td>${formatGrade(group.grades.B)}</td>
+              <td>${formatGrade(group.grades.C)}</td>
+              <td>${formatGrade(group.grades.D)}</td>
+              <td>${formatGrade(group.grades.F)}</td>
+              <td>${formatGrade(group.grades.I)}</td>
+              <td>${formatGrade(group.grades.Q)}</td>
+            </tr>
+            ${sectionRows}
+          `);
+        });
+
+        gradeTableBody.innerHTML = tableRows.join('');
+      }
+
+      // Update the toggleSections function
+      window.toggleSections = function(groupId) {
+        const mainRow = document.querySelector(`tr[data-group-id="${groupId}"]`);
+        const sectionRows = document.querySelectorAll(`tr.section-row[data-group-id="${groupId}"]`);
+        const button = mainRow.querySelector('.section-toggle');
+        
+        let isHidden = true;
+        sectionRows.forEach(row => {
+          if (row.style.display !== 'none') {
+            isHidden = false;
+          }
+        });
+
+        sectionRows.forEach(row => {
+          row.style.display = isHidden ? '' : 'none';
+        });
+        
+        button.textContent = isHidden ? 'Hide Sections' : 'Show Sections';
+      };
+
+      function updateChart() {
+        if (!allData) return;
+
+        if (mainChart) {
+          mainChart.destroy();
+        }
+
+        const config = createGPAChart(allData);
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        mainChart = new Chart(ctx, config);
+        
+        chartTitle.textContent = 'GPA Trends by Professor';
+        updateTable();
+      }
+
+      function createGPAChart(processedData) {
+        const years = Object.keys(processedData.byYear).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        const datasets = processedData.professors
+          .map(prof => {
+            const data = years.map(year => {
+              const gpa = processedData.byProfessor[prof.name]?.gpaByYear[year];
+              return gpa !== undefined ? gpa : null;
+            });
+            
+            return {
+              label: prof.name,
+              data: data,
+              borderColor: prof.color,
+              backgroundColor: 'transparent',
+              fill: false,
+              tension: 0.1,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              borderWidth: 2
+            };
+          });
+
+        // Calculate Y-axis range
+        const allGPAs = datasets.flatMap(d => d.data.filter(v => v !== null));
+        if (allGPAs.length === 0) {
+          return {
+            type: 'line',
+            data: {
+              labels: years,
+              datasets: []
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  min: 0,
+                  max: 4.0,
+                  ticks: {
+                    stepSize: 0.5
+                  }
+                }
+              }
+            }
+          };
+        }
+
+        const minGPA = Math.min(...allGPAs);
+        const maxGPA = Math.max(...allGPAs);
+        const range = maxGPA - minGPA;
+        const padding = range * 0.1;
+        const yMin = Math.max(0, Math.floor((minGPA - padding) * 2) / 2);
+        const yMax = Math.min(4.0, Math.ceil((maxGPA + padding) * 2) / 2);
+
+        return {
+          type: 'line',
+          data: {
+            labels: years,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                min: yMin,
+                max: yMax,
+                ticks: {
+                  stepSize: 0.5
+                }
+              },
+              x: {
+                grid: {
+                  display: true,
+                  color: 'rgba(0, 0, 0, 0.1)'
+                }
+              }
+            },
+            plugins: {
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                  title: function(context) {
+                    return `Year: ${context[0].label}`;
+                  },
+                  label: function(context) {
+                    const value = context.parsed.y;
+                    return `${context.dataset.label}: ${value === null ? 'No data' : value.toFixed(2)}`;
+                  }
+                }
+              },
+              legend: {
+                display: true,
+                position: 'bottom',
+                align: 'start',
+                labels: {
+                  padding: 20,
+                  font: {
+                    size: 11
+                  },
+                  boxWidth: 12,
+                  boxHeight: 12,
+                  usePointStyle: true
+                }
+              }
+            },
+            layout: {
+              padding: {
+                bottom: 100
+              }
+            }
+          }
+        };
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const dept = document.getElementById('dept').value.trim();
+        const course = document.getElementById('course').value.trim();
+
+        if (!dept || !course) {
+          showError("Please enter both department and course number");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        errorAlert.classList.add('d-none');
+        results.classList.add('d-none');
+        loadingContainer.classList.remove('d-none');
+
+        try {
+          const formData = new URLSearchParams();
+          formData.append('dept', dept.toUpperCase());
+          formData.append('number', course);
+
+          const response = await axios.post(
+            "/api/proxy",
+            formData.toString(),
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "*/*",
+                "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+              }
+            }
+          );
+
+          if (response.data && response.data.classes && response.data.classes.length > 0) {
+            allData = processData(response.data.classes);
+            updateProfessorList(allData);
+            updateChart();
+            updateTable();
+            results.classList.remove('d-none');
+          } else {
+            showError("No data found for this course");
+          }
+        } catch (err) {
+          console.error("Error:", err);
+          showError(err.response?.data?.error || "Failed to fetch data");
+        } finally {
+          submitBtn.disabled = false;
+          loadingContainer.classList.add('d-none');
+        }
+      });
+
+      function showError(message) {
+        errorAlert.textContent = message;
+        errorAlert.classList.remove('d-none');
+        results.classList.add('d-none');
+      }
+    });
+  </script>
+</body>
+</html> 
