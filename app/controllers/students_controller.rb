@@ -462,12 +462,7 @@ class StudentsController < ApplicationController
     render json: { error: 'Unable to fetch degree requirements' }, status: :internal_server_error
   end
 
-  ##def academic_progress
-    ##@student = Student.find_by(google_id: params[:google_id])
 
-    ##if @student
-      ##@prev_student_courses = PrevStudentCourse.where(uin: @student.uin)
-  ##end
 
   def academic_progress
     @student = Student.find_by(google_id: params[:google_id])
@@ -482,9 +477,13 @@ class StudentsController < ApplicationController
   
       # In-Progress Courses: where no grade is assigned (you can adjust this based on your criteria)
       @in_progress_courses = prev_courses.select { |course| course.grade == "NR" }
+
+      @recommended_courses = RecCourse.where(uin: @student.id)
+
+      combined_courses = remaining_courses + @recommended_courses
   
       # Remaining Courses: this can be more complex depending on how you determine remaining courses
-      @remaining_courses = remaining_courses.reject do |course|
+      @remaining_courses = combined_courses.reject do |course|
         prev_courses.any? { |prev_course| prev_course.course_id == course.course_id}
       end
 

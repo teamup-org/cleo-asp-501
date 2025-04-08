@@ -42,6 +42,11 @@
    
     <!-- Credits Scale -->
     <h4 class="text-dark text-left mt-4 font-weight-bolder">Track Your Progress</h4>
+    <div class="text-center">
+      <p class="text-dark font-weight-bold">
+        You are <%= ((@student.total_credits_completed || 0) / 126.0 * 100).round(2) %>% done with your degree.
+      </p>
+    </div>
     <div class="credits-scale">
       <div class="credits-scale-labels">
         <span>0</span>
