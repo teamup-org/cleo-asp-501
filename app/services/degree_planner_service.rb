@@ -26,27 +26,40 @@ class DegreePlannerService
   end
 
   def generate_recommended_semester(semester, max_credits = 15)
-
-    # Get all the generated courses
-    search_courses
-
-    # Get all the courses I have already completed
-    completed_courses = @student.student_courses.where("sem < ?", semester).includes(:course)
-    completed_course_ids = completed_courses.map { |sc| sc.course_id }
-
-    # @courses - completed_courses
-    remaining_courses = @courses.reject { |course_info| completed_course_ids.include?(course_info[:course_id]) }
-    
-    # Already sorted better...
-    # sorted_courses = remaining_courses.sort_by { |c| c[:sem] || 0 }
+    # Get all the generated course hashes
+    search_courses  # sets @courses = array of hashes with :course_id, etc.
+  
+    # Get completed course_ids from current student courses
+    completed_course_ids = @student.student_courses
+                                   .where("sem < ?", semester)
+                                   .pluck(:course_id)
+  
+    # Get completed course_ids from transcript-based courses
+    transcript_course_ids = PrevStudentCourse
+                              .where(uin: @student.id)
+                              .pluck(:course_id)
+  
+    # Combine all completed course IDs
+    all_completed_course_ids = (completed_course_ids + transcript_course_ids).uniq
+  
+    # Filter @courses to remove any already completed
+    remaining_courses = @courses.reject do |course_info|
+      all_completed_course_ids.include?(course_info[:course_id])
+    end
+  
+    # Select up to max_credits worth of courses (you can add credit logic here later)
     semester_recommended_courses = remaining_courses.take(6)
-
-    # for every single course in semester_recommended_courses set its semester to the target semester
-    semester_recommended_courses.each { |rec| rec[:sem] = semester }
-
+  
+    # Assign the target semester to each course hash
+    semester_recommended_courses.each do |rec|
+      rec[:sem] = semester
+    end
+  
+    puts "semester_recommended_courses: #{semester_recommended_courses.inspect}"
 
     return semester_recommended_courses
   end
+  
 
   private
 
