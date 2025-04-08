@@ -198,6 +198,10 @@ After login, click `View Default Degree Plan`
 After login, click `Profile` -> `Edit Profile` then the user should be able to change any of the drop down items as well as give FERPA consent. Once clicking, the user can change any of the fields then click `Save Changes`. 
 The user should see a green banner at the top saying changes are saved and the current user preferences should be shown on the left of the student profile.
 
+### How to access Academic Progress
+After login, click `Profile` and a progress bar is displayed at the bottom of the screen. This displays the user's current progress towards their degree in years and a percentage.
+From there, click `Home` to go back to the dashboard and then click `Current Academic Progress`. The user can now see which courses they have completed, are in-progress, and remaining.
+
 ### How to access help
 After login, click on the 3 bars in the top left corner -> `Support/Help` -> `Help Page`. Here you show find some frequently asked questions as well as a link the the `CLEO Github` which contains our README.
 

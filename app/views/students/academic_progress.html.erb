@@ -1,0 +1,72 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="mb-0">Academic Progress</h1>
+  <div>
+    <%= link_to student_dashboard_path(current_student_login), class: "btn btn-outline-secondary me-2" do %>
+      <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+    <% end %>
+  </div>
+</div>
+
+<table class="academic-progress-table">
+  <thead>
+    <tr>
+      <th colspan="4">Completed</th>
+      <th colspan="4">In-Progress</th>
+      <th colspan="4">Remaining</th>
+    </tr>
+    <tr>
+      <th>Course Code</th>
+      <th>Course Number</th>
+      <th>Credit Hours</th>
+      <th>Grade</th>
+
+      <th>Course Code</th>
+      <th>Course Number</th>
+      <th>Credit Hours</th>
+      <th>Grade</th>
+
+      <th>Course Code</th>
+      <th>Course Number</th>
+      <th>Credit Hours</th>
+      <th>Grade</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% max_rows = [@completed_courses.size, @in_progress_courses.size, @remaining_courses.size].max %>
+
+    <% max_rows.times do |i| %>
+      <tr>
+        <!-- Completed Courses -->
+        <% if @completed_courses[i] %>
+          <td class="completed"><%= @completed_courses[i].course.ccode %></td>
+          <td class="completed"><%= @completed_courses[i].course.cnumber %></td>
+          <td class="completed"><%= @completed_courses[i].course.credit_hours %></td>
+          <td class="completed"><%= @completed_courses[i].grade %></td>
+        <% else %>
+          <td class="completed"></td><td class="completed"></td><td class="completed"></td><td class="completed"></td>
+        <% end %>
+
+        <!-- In-Progress Courses -->
+        <% if @in_progress_courses[i] %>
+          <td class="in-progress"><%= @in_progress_courses[i].course.ccode %></td>
+          <td class="in-progress"><%= @in_progress_courses[i].course.cnumber %></td>
+          <td class="in-progress"><%= @in_progress_courses[i].course.credit_hours %></td>
+          <td class="in-progress"><%= @in_progress_courses[i].grade %></td>
+        <% else %>
+          <td class="in-progress"></td><td class="in-progress"></td><td class="in-progress"></td><td class="in-progress"></td>
+        <% end %>
+
+        <!-- Remaining Courses -->
+        <% if @remaining_courses[i] %>
+          <td class="remaining"><%= @remaining_courses[i].course.ccode %></td>
+          <td class="remaining"><%= @remaining_courses[i].course.cnumber %></td>
+          <td class="remaining"><%= @remaining_courses[i].course.credit_hours %></td>
+          <td class="remaining">-</td> <!-- No grade for remaining courses -->
+        <% else %>
+          <td class="remaining"></td><td class="remaining"></td><td class="remaining"></td><td class="remaining"></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

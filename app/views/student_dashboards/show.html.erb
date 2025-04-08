@@ -70,6 +70,7 @@
       <li><%= link_to 'View Default Degree Plan', degree_plan_path, class: 'action-button' %></li>
       <li><%= link_to 'Build Your Degree Planner', student_degree_planner_path(@student&.google_id), class: 'action-button' %></li>
       <li><%= link_to 'View Grade Distribution', grade_distribution_student_dashboard_path(@student&.google_id), class: 'action-button' %></li>
+      <li><%= link_to 'Current Academic Progress', academic_progress_student_path(@student&.google_id), class: 'action-button' %></li>
     </ul>
   </div>
 

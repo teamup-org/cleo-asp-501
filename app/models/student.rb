@@ -44,7 +44,7 @@ class Student < ApplicationRecord
   after_create :assign_default_courses
 
   def total_credits_completed
-    courses.sum(:credit_hours)
+    prev_student_courses.reject { |course| course.grade == "NR" }.sum { |course| course.course.credit_hours }
   end
 
   private
