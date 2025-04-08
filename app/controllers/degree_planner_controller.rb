@@ -81,7 +81,15 @@ class DegreePlannerController < ApplicationController
 
     if rec_course
       rec_course.destroy
+
+    student_course = StudentCourse.find_by(student_id: @student.id, course_id: params[:course_id])
+    if student_course
+      student_course.destroy
+    end
+
       flash[:success] = 'Course removed successfully!'
+    
+    
 
     else
       flash[:error] = 'Course not found in your planner.'

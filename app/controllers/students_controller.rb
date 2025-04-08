@@ -176,7 +176,7 @@ class StudentsController < ApplicationController
               course.save!
             end
             
-            # Normalize grade to fit within 2 characters
+            # Normalize grade to fit within 3 characters
             grade = course_data['grade'].to_s.upcase
             grade = case grade
                    when /^A[+-]?$/ then 'A'
@@ -192,6 +192,7 @@ class StudentsController < ApplicationController
                    when /^CR$/ then 'CR'
                    when /^P$/ then 'P'
                    when /^NP$/ then 'NP'
+                   when /^TCR$/ then 'TCR'
                    else 'NR' # Not Reported
                    end
             
@@ -460,6 +461,48 @@ class StudentsController < ApplicationController
     Rails.logger.error "Error fetching degree requirements: #{e.message}"
     render json: { error: 'Unable to fetch degree requirements' }, status: :internal_server_error
   end
+
+  ##def academic_progress
+    ##@student = Student.find_by(google_id: params[:google_id])
+
+    ##if @student
+      ##@prev_student_courses = PrevStudentCourse.where(uin: @student.uin)
+  ##end
+
+  def academic_progress
+    @student = Student.find_by(google_id: params[:google_id])
+  
+    if @student
+      # Query prev_student_courses for the student using their UIN
+      prev_courses = @student.prev_student_courses
+      remaining_courses = @student.student_courses
+  
+      # Completed Courses: where a grade is available
+      @completed_courses = prev_courses.reject { |course| course.grade == "NR" }
+  
+      # In-Progress Courses: where no grade is assigned (you can adjust this based on your criteria)
+      @in_progress_courses = prev_courses.select { |course| course.grade == "NR" }
+  
+      # Remaining Courses: this can be more complex depending on how you determine remaining courses
+      @remaining_courses = remaining_courses.reject do |course|
+        prev_courses.any? { |prev_course| prev_course.course_id == course.course_id}
+      end
+
+      # Fetch course details for remaining courses (using the course_id from student_courses)
+      @remaining_courses_details = @remaining_courses.map do |course|
+        course_details = Course.find(course.course_id) # Assuming the course_id maps to a Course
+        {
+          course_code: course_details.ccode,
+          course_number: course_details.cnumber,
+          credit_hours: course_details.credit_hours
+        }
+      end      
+    else
+      flash[:alert] = "Student not found"
+      redirect_to some_other_path # replace with a fallback route
+    end
+  end
+  
   
   private
 

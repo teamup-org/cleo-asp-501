@@ -100,6 +100,8 @@ Rails.application.routes.draw do
       get 'view_transcript_courses'
       delete 'remove_transcript_course'
       post 'add_transcript_course'
+
+      get 'academic_progress', to: 'students#academic_progress'
     end
 
     resource :degree_planner, only: [:show], controller: 'degree_planner' do

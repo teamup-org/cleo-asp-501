@@ -5,7 +5,7 @@ class PrevStudentCourse < ApplicationRecord
     validates :uin, presence: true
     validates :course_id, presence: true
     validates :semester, presence: true
-    validates :grade, length: { maximum: 2 }, allow_blank: true
+    validates :grade, length: { maximum: 3 }, allow_blank: true
 
     # Validates uniqueness of course per student
     validates :course_id, uniqueness: { scope: :uin, message: "has already been taken for this student" }

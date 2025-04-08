@@ -1,0 +1,34 @@
+.academic-progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .academic-progress-table th,
+  .academic-progress-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .academic-progress-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  /* Background color for Completed Courses (Green) */
+  .completed {
+    background-color: #d4edda; /* Light Green */
+  }
+  
+  /* Background color for In-Progress Courses (Yellow) */
+  .in-progress {
+    background-color: #fff3cd; /* Light Yellow */
+  }
+  
+  /* Background color for Remaining Courses (Red) */
+  .remaining {
+    background-color: #f8d7da; /* Light Red */
+  }
+  
+  

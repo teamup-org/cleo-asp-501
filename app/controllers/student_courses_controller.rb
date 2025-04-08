@@ -53,6 +53,8 @@ class StudentCoursesController < ApplicationController
   def destroy
     # @student_course = StudentCourse.find(params[:id])
     @student_course = set_student_course
+    if @student_course
+      @student_course.destroy
     redirect_to student_courses_path(student_id: params[:student_id]), status: :see_other,
                                                                        notice: 'Course removed successfully.'
   end
