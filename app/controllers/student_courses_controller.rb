@@ -55,6 +55,7 @@ class StudentCoursesController < ApplicationController
     @student_course = set_student_course
     if @student_course
       @student_course.destroy
+    end
     redirect_to student_courses_path(student_id: params[:student_id]), status: :see_other,
                                                                        notice: 'Course removed successfully.'
   end
