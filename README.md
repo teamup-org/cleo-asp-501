@@ -180,6 +180,10 @@ To create an account click on the `Login with Google` button on the landing page
 After login, click `Profile` -> `Choose File` (choose a your saved transcript.pdf) -> click `Upload New Transcript`.
 You should then be able to change class names and unselect classes to fix any errors with the gathered classes.
 
+## How to test recommended semester
+After Uploading your transcript, I recommend to better see the "recommended semester" you clear the degree planner that way their is not still a bunch of random classes on your degree planner that you may/may not need. Once you clear, go to the Spring 2025 and click the  `Generate Recommended Semester` next to "Sprint 2025", after that (assuming you are using the provided file.pdf example), you should see something similiar to the following: 
+<img width="637" alt="ExampleRecImage" src="https://github.com/user-attachments/assets/ed94c155-b209-4565-948b-83d20bcff3af" />
+
 ### How to see a generic degree planner
 After login, click `View Default Degree Plan`
 
