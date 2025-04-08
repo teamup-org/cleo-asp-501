@@ -226,6 +226,10 @@ class DegreePlannerController < ApplicationController
                          .flatten
                          .map(&:course)
 
+      prev_transcript_courses = PrevStudentCourse.where(uin: @student.id).map(&:course)
+
+      previous_courses = (previous_courses + prev_transcript_courses).uniq
+
       # Get prerequisite groups for the current course
       prereq_groups = course.prerequisite_groups
 
