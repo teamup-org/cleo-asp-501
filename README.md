@@ -176,7 +176,7 @@ Continuous integration was employed through the use of Github actions. Our workf
 ### Creating a new account
 To create an account click on the `Login with Google` button on the landing page, then click an account, if it has never been used before a new account will be created with that email. PLEASE MAKE SURE YOU CLICK COMPUTER SCIENCE FOR YOUR MAJOR -- As of right now we were only given the .csv files for computer science and if you try another major, clicking generate plan / generate reccomended semester may not do anything because their is no information for other majors!
 
-## How to check for a missing prereq
+### How to check for a missing prereq
 After login, click `Build Your Degree Planner` and then remove MATH 151 from Spring 2025, you should see a red banner at the top of the screen. Note: If you are doing this after you have uploaded the file.pdf transcript, In my tests Computer Organization is a class that you should be able to remove to check for any prereq issues with Programming Studio but it may be a bit difficult to find a prereq that I have not already completed so I recommend doing this step first before uploading file.pdf.
 
 ### How to upload your unofficial transcript
