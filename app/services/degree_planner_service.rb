@@ -48,7 +48,7 @@ class DegreePlannerService
     end
   
     # Select up to max_credits worth of courses (you can add credit logic here later)
-    semester_recommended_courses = remaining_courses.take(6)
+    semester_recommended_courses = remaining_courses#.take(6)
   
     # Assign the target semester to each course hash
     semester_recommended_courses.each do |rec|

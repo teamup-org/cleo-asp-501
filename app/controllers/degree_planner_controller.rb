@@ -128,13 +128,18 @@ class DegreePlannerController < ApplicationController
     planner_service = DegreePlannerService.new(@student, "Mathematics", "Algorithms and Theory")
     planned_courses = planner_service.generate_recommended_semester(semester_index)
 
+    added_count = 0
+
     planned_courses.each do |course_info|
+      break if added_count >= 5
+    
       unless StudentCourse.exists?(student: @student, course_id: course_info[:course_id])
         StudentCourse.create!(
           student: @student,
           course_id: course_info[:course_id],
           sem: course_info[:sem]
         )
+        added_count += 1
       end
     end
 
