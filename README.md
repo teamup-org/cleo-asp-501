@@ -174,7 +174,7 @@ Continuous integration was employed through the use of Github actions. Our workf
 
 ## How to test
 ### Creating a new account
-To create an account click on the `Login with Google` button on the landing page, then click an account, if it has never been used before a new account will be created with that email.
+To create an account click on the `Login with Google` button on the landing page, then click an account, if it has never been used before a new account will be created with that email. PLEASE MAKE SURE YOU CLICK COMPUTER SCIENCE FOR YOUR MAJOR -- As of right now we were only given the .csv files for computer science and if you try another major, clicking generate plan / generate reccomended semester may not do anything because their is no information for other majors!
 
 ### How to upload your unofficial transcript
 After login, click `Profile` -> `Choose File` (choose a your saved transcript.pdf) -> click `Upload New Transcript`.
