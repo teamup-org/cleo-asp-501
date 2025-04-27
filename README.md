@@ -205,6 +205,8 @@ From there, click `Home` to go back to the dashboard and then click `Current Aca
 ### How to access help
 After login, click on the 3 bars in the top left corner -> `Support/Help` -> `Help Page`. Here you show find some frequently asked questions as well as a link the the `CLEO Github` which contains our README.
 
+### How to Install System in Render Account
+As of right now, due to having the free version of Render we can not share the system. Please message us in the Teamup discord when you are ready for us to transfer ownership to you.
 
 ## Support
 The support of the application will close on May 6th.
