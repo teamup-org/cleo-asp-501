@@ -254,6 +254,13 @@ class DegreePlannerController < ApplicationController
         }
       end
 
+      # puts("=========================================================================\n")
+      # puts("=========================================================================\n")
+      # puts(missing_prereqs.inspect)
+      # puts("=========================================================================\n")
+      # puts("=========================================================================\n")
+      # sleep(10)
+
       {
         student_course:,
         prerequisites_met: missing_prereqs.empty?,
@@ -304,9 +311,22 @@ class DegreePlannerController < ApplicationController
     end
     # Check if I am missing a required class
     missing_prereqs = @course_prerequisite_status.select { |status| !status[:prerequisites_met] }
+    # prereqs = @course_prerequisite_status.select { |status| !status[:missing_prerequisites] }
+
+    puts("=========================================================================\n")
+    puts("=========================================================================\n")
+    puts(missing_prereqs.inspect)
+    puts("=========================================================================\n")
+    puts("=========================================================================\n")
+
     if missing_prereqs.any?
       flash[:error] = "You are missing prerequisites for the following courses: " +
-                      missing_prereqs.map { |status| status[:student_course].course.cname }.join(', ')
+                      missing_prereqs.map { |status| status[:student_course].course.cname }.join(', ') +
+                      ", You need the following courses: " + 
+                      missing_prereqs.flat_map { |status| 
+                        status[:missing_prerequisites].flat_map { |prereq| prereq[:courses] }
+                      }.map(&:cname).uniq.join(', ')
+
     end
 
 
