@@ -1,8 +1,19 @@
 # README 
 
 ## Introduction to our Project
+#CLEO - Smart Course Scheduler
 
-Our team is creating a degree planner application for Texas A&M University students called Cleo. Students can create a user profile based on their interests and will be recommended courses to take in their upcoming semesters. 
+Our team is creating a degree planner application for Texas A&M University students called Cleo. Students can create a user profile based on their interests and will be recommended courses to take in their upcoming semesters. The TAMU anex grade distributions and academic progress trackers are also integrated in this application.
+
+###Table of Contents
+ - Requirements
+ - (External) Dependencies
+ - Environmental Variables/Files
+ - Installation and Setup
+ - Usage/Features/Testing
+ - Documentation
+ - Licence
+ - Credits/Acknoledgements/Contact Information
 
 ## Requirements
 
@@ -172,7 +183,7 @@ Continuous integration was employed through the use of Github actions. Our workf
 - Rubocop linting
 - Brakeman tests
 
-## How to test
+## Usage/Features/Testing
 ### Creating a new account
 To create an account click on the `Login with Google` button on the landing page, then click an account, if it has never been used before a new account will be created with that email. PLEASE MAKE SURE YOU CLICK COMPUTER SCIENCE FOR YOUR MAJOR -- As of right now we were only given the .csv files for computer science and if you try another major, clicking generate plan / generate reccomended semester may not do anything because their is no information for other majors!
 
@@ -217,6 +228,9 @@ To all developers looking to build upon this project, here are several features 
 - Extension of scope to include students from other faculties, departments and colleges
 - Ability for users to express their interests more (outside of ```tracks``` and ```emphasis```) allowing for a more involved reccomendation algorithm
 
+##LICENCE
+This app is under IP of Texas A&M University and is under ownership of Dr. Kebo and TEAMUP
+
 ## Acknowledgement
 We would like to thank Professor Wade for her continued support in this project. We would also like to thank our customer Dr. Kebo for his insights, feedback and creation of a positive environment for learning.
 
@@ -228,11 +242,23 @@ Prevoius Cleo group members:
 - Neale Tham
 
 Current Cleo group members:
-- Kyle Moore
-- Joe Depolo
-- Danny Garmendez
-- Alyan Tharani
-- Cameron Cao  
+
+#Danny Garmendez 
+Email: dannyernesto@tamu.edu 
+Phone: 512-826-3541 
+#Joseph DePolo 
+Email: joedepolo@tamu.edu 
+Phone: 267-6646086 
+#Alyan Tharani 
+Email: alnotha@tamu.edu 
+Phone: 832-290-9250 
+#Cameron Cao 
+Email: camcao@tamu.edu 
+Phone: 469-347-9740 
+#Kyle Moore 
+Email: kyle.moore@tamu.edu 
+Phone: 832-795-9251 
+ 
 
 
 ## References
