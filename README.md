@@ -22,13 +22,73 @@ What is needed to run and code our test:
 - Ruby ~ 3.3.4
 - Rails ~ 7.2.1
 - PostgreSQL ~ 14.13
-- Ruby Gems ~ Listed in ‘Gemfile’
+- Ruby Gems:
+- source "https://rubygems.org"
+
+gem "rails", "~> 7.2.1"
+gem "sprockets-rails"
+gem "pg", "~> 1.1"
+gem "puma", ">= 5.0"
+gem "importmap-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
+gem "jbuilder"
+gem 'rubocop', require: false
+gem 'rexml'
+gem 'zeitwerk', '< 2.7.0'
+
+# Add net-pop with a specific version
+
+# Other gems...
+gem "tzinfo-data", platforms: %i[mingw mswin mswin64 jruby]
+gem "bootsnap", require: false
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection'
+gem 'dotenv-rails', groups: [:development, :test]
+gem 'bootstrap', '~> 5.0.0'
+gem 'sassc-rails'
+gem 'pycall'
+
+group :development, :test do
+  gem "debug", platforms: %i[ mingw mswin mswin64 jruby ], require: "debug/prelude"
+  gem "brakeman", require: false
+  gem "rubocop-rails-omakase", require: false
+  gem "rspec-rails", "~> 7.0.0"
+end
+
+group :development do
+  gem "web-console"
+end
+
+group :test do
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "webdrivers"
+  gem "simplecov", require: false
+  gem 'rails-controller-testing'
+end
+
+gem "net-pop", github: "ruby/net-pop"
+gem 'jquery-rails'
+gem 'csv'
+gem 'prawn'
+
+# For course selection search function
+gem 'select2-rails'
+
+# For scraping the registrar website / Anex Scrape
+gem 'httparty'
 
 ## External dependencies
 
 - Docker - Download latest version at https://www.docker.com/products/docker-desktop
 - Git - Download latest version at https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
-
+- Ubuntu 22 / Download the latest version for development
+- VScode 1.99
+- JIRA
+- Render
 ## Documentation
 Our [product and sprint backlog](https://501-cleo.atlassian.net/jira/software/projects/CLEO/boards/1/backlog) can be found in Jira, with project name CLEO
 
